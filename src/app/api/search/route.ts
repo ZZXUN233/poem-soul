@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { getSearchIndex } from "@/lib/corpus";
 import { buildSearchResponse, normalizeKeyword, searchPoems } from "@/lib/search";
-import type { Mode } from "@/lib/mode";
+import { isMode, type Mode } from "@/lib/mode";
 import type { SearchGroup, SearchQuery } from "@/types";
 
 export const runtime = "nodejs";
@@ -12,19 +12,22 @@ const MODES: Mode[] = ["classic", "modern"];
 const LABELS: Record<Mode, string> = { classic: "古诗词", modern: "现代诗" };
 
 /**
- * GET /api/search?q=关键词&dynasty=&form=&match=&page=&pageSize=
- * 同时检索古诗词 + 现代诗两个语料库，结果按语料库分组返回。
+ * GET /api/search?q=关键词&mode=classic|modern&dynasty=&form=&match=&page=&pageSize=
+ * 根据 mode 参数检索对应语料库，默认同时检索两个库。
  * dynasty/form 仅作用于古诗词组（现代诗无朝代/体裁概念）；match 作用于两组。
  */
 export async function GET(request: NextRequest) {
   const sp = request.nextUrl.searchParams;
   const q = normalizeKeyword(sp.get("q") ?? "");
 
+  const rawMode = sp.get("mode");
+  const modes: Mode[] = isMode(rawMode) ? [rawMode] : MODES;
+
   if (!q) {
     return Response.json(
       {
         q: "",
-        groups: MODES.map((m) => ({
+        groups: modes.map((m) => ({
           mode: m,
           label: LABELS[m],
           total: 0,
@@ -49,7 +52,7 @@ export async function GET(request: NextRequest) {
 
   try {
     const groups: SearchGroup[] = [];
-    for (const md of MODES) {
+    for (const md of modes) {
       const poems = await getSearchIndex(md);
       // 朝代/体裁过滤仅对古诗词有意义，现代诗忽略
       const dyn = md === "classic" ? dynasty : undefined;

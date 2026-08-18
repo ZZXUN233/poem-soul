@@ -7,6 +7,7 @@ import FilterBar from "@/components/FilterBar";
 import Pagination from "@/components/Pagination";
 import PoemCard from "@/components/PoemCard";
 import type { GroupSearchResponse, MatchKind, SearchGroup, SearchHit } from "@/types";
+import type { Mode } from "@/lib/mode";
 
 /** 命中 tab 选项 */
 const MATCH_TABS: { key: MatchKind | ""; label: string }[] = [
@@ -16,11 +17,15 @@ const MATCH_TABS: { key: MatchKind | ""; label: string }[] = [
   { key: "content", label: "命中正文" },
 ];
 
-/** 搜索页客户端：跨库检索（古诗词 + 现代诗），按语料库分组展示；URL 驱动可分享 */
+const MODE_LABELS: Record<Mode, string> = { classic: "古诗词", modern: "现代诗" };
+
+/** 搜索页客户端：根据 mode 检索对应语料库，按 mode 分组展示；URL 驱动可分享 */
 export default function SearchPage({
+  mode,
   dynasties,
   forms,
 }: {
+  mode: Mode;
   dynasties: string[];
   forms: string[];
 }) {
@@ -49,6 +54,7 @@ export default function SearchPage({
       page?: number;
     }) => {
       const sp = new URLSearchParams();
+      sp.set("mode", mode);
       const nextQ = updates.q ?? q;
       const nextDynasty = updates.dynasty ?? dynasty;
       const nextForm = updates.form ?? form;
@@ -61,7 +67,7 @@ export default function SearchPage({
       if (nextPage && nextPage > 1) sp.set("page", String(nextPage));
       router.push(`/search?${sp.toString()}`);
     },
-    [router, q, dynasty, form, match, page]
+    [router, q, dynasty, form, match, page, mode]
   );
 
   const doSearch = useCallback(
@@ -70,14 +76,20 @@ export default function SearchPage({
       dyn: string | undefined,
       f: string | undefined,
       mt: MatchKind | "",
-      pg: number
+      pg: number,
+      currentMode: Mode
     ) => {
       if (!kw) {
         setResult(null);
         return;
       }
       setLoading(true);
-      const sp = new URLSearchParams({ q: kw, page: String(pg), pageSize: "20" });
+      const sp = new URLSearchParams({
+        q: kw,
+        page: String(pg),
+        pageSize: "20",
+        mode: currentMode,
+      });
       if (dyn) sp.set("dynasty", dyn);
       if (f) sp.set("form", f);
       if (mt) sp.set("match", mt);
@@ -94,11 +106,11 @@ export default function SearchPage({
 
   useEffect(() => {
     if (q) {
-      doSearch(q, dynasty, form, match, page);
+      doSearch(q, dynasty, form, match, page, mode);
     } else {
       setResult(null);
     }
-  }, [q, dynasty, form, match, page, doSearch]);
+  }, [q, dynasty, form, match, page, mode, doSearch]);
 
   const onSearch = (kw: string) => {
     syncUrl({ q: kw, page: 1 });
@@ -110,18 +122,22 @@ export default function SearchPage({
         诗海寻珠
       </h1>
       <SearchBar defaultValue={q} onSearch={onSearch} />
-      <FilterBar
-        dynasties={dynasties}
-        forms={forms}
-        activeDynasty={dynasty}
-        activeForm={form}
-        onDynastyChange={(d) => syncUrl({ dynasty: d, page: 1 })}
-        onFormChange={(f) => syncUrl({ form: f, page: 1 })}
-      />
+
+      {/* 过滤栏仅古诗词模式显示（朝代/体裁是古诗词概念） */}
+      {mode === "classic" && (
+        <FilterBar
+          dynasties={dynasties}
+          forms={forms}
+          activeDynasty={dynasty}
+          activeForm={form}
+          onDynastyChange={(d) => syncUrl({ dynasty: d, page: 1 })}
+          onFormChange={(f) => syncUrl({ form: f, page: 1 })}
+        />
+      )}
 
       {!q && (
         <div className="notice">
-          输入标题、作者或诗句，同时检索古诗词与现代诗语料库。
+          输入标题、作者或诗句，检索{MODE_LABELS[mode]}语料库。
         </div>
       )}
 

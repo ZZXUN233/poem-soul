@@ -1,11 +1,17 @@
 import { getMeta } from "@/lib/corpus";
+import { isMode, type Mode } from "@/lib/mode";
 import SearchPage from "@/components/SearchPage";
 
 export const dynamic = "force-dynamic";
 
-/** 搜索页（服务端壳：加载古诗词朝代/体裁枚举，用于过滤古诗词组；跨库检索古诗词+现代诗） */
-export default async function SearchPageWrapper() {
-  // 朝代/体裁是古诗词概念，过滤仅作用于古诗词组 → 恒用经典枚举
-  const meta = await getMeta("classic");
-  return <SearchPage dynasties={meta.allDynasties} forms={meta.allForms} />;
+interface SearchPageProps {
+  searchParams: Promise<{ q?: string; dynasty?: string; form?: string; match?: string; mode?: string; page?: string }>;
+}
+
+/** 搜索页（服务端壳：根据 mode 参数加载对应语料库的朝代/体裁枚举） */
+export default async function SearchPageWrapper({ searchParams }: SearchPageProps) {
+  const sp = await searchParams;
+  const mode: Mode = isMode(sp.mode) ? sp.mode : "classic";
+  const meta = await getMeta(mode);
+  return <SearchPage mode={mode} dynasties={meta.allDynasties} forms={meta.allForms} />;
 }
