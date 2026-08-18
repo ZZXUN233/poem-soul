@@ -25,14 +25,19 @@ export async function GET(request: NextRequest) {
 
   const dynasty = sp.get("dynasty") || undefined;
   const form = sp.get("form") || undefined;
+  const matchRaw = sp.get("match") || undefined;
+  const match =
+    matchRaw === "title" || matchRaw === "author" || matchRaw === "content"
+      ? matchRaw
+      : undefined;
   const page = Number(sp.get("page") ?? 1);
   const pageSize = Number(sp.get("pageSize") ?? 20);
 
-  const query: SearchQuery = { q, dynasty, form, page, pageSize };
+  const query: SearchQuery = { q, dynasty, form, match, page, pageSize };
 
   try {
     const poems = await getSearchIndex();
-    const hits = searchPoems(poems, q, { dynasty, form });
+    const hits = searchPoems(poems, q, { dynasty, form, match });
     const response = buildSearchResponse(hits, query);
     return Response.json(response);
   } catch (err) {

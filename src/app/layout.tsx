@@ -25,9 +25,6 @@ export default function RootLayout({
             <nav className="header-nav">
               <Link href="/">书架</Link>
               <Link href="/search">搜索</Link>
-              <Link href="/ai" className="ai-link">
-                诗魂 AI
-              </Link>
             </nav>
           </div>
         </header>

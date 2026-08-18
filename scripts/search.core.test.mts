@@ -14,6 +14,7 @@ import {
   normalizeKeyword,
   searchPoems,
 } from "../src/lib/search";
+import { poemLines, transformable } from "../src/lib/format";
 import type { Poem } from "../src/types";
 
 const poem: Poem = {
@@ -108,4 +109,56 @@ test("buildSearchResponse 剥离内部 score 并分页", () => {
     resp.hits.every((h) => (h as any).score === undefined),
     "内部 score 不得出现在响应中"
   );
+});
+
+// 一首同时命中 标题+正文 的样例
+const both: Poem = {
+  id: "tang-000003",
+  title: "明月",
+  author: "某甲",
+  dynasty: "唐",
+  form: "五言绝句",
+  content: "床前明月光，疑是地上霜。",
+};
+
+test("一首可同时命中标题与正文（fields 记录）", () => {
+  const hits = searchPoems([poem, both], "明月");
+  const hit = hits.find((h) => h.poem.id === "both" || h.poem.title === "明月");
+  assert.ok(hit, "应命中 both");
+  assert.ok(hit!.fields.includes("title"));
+  assert.ok(hit!.fields.includes("content"));
+});
+
+test("match 过滤：命中标题 / 命中正文 tab", () => {
+  const base = [poem, other, kait, both];
+  const titleOnly = searchPoems(base, "明月", { match: "title" });
+  // 只有 both 的标题命中
+  assert.equal(titleOnly.length, 1);
+  assert.equal(titleOnly[0].poem.title, "明月");
+
+  const contentOnly = searchPoems(base, "明月", { match: "content" });
+  // poem(静夜思正文两处) + both(正文一处)
+  assert.ok(contentOnly.length >= 2);
+  assert.ok(contentOnly.some((h) => h.poem.id === "tang-000001"));
+
+  const authorOnly = searchPoems(base, "明月", { match: "author" });
+  assert.equal(authorOnly.length, 0);
+});
+
+test("poemLines 对仗分组：五言绝句切成 2 联", () => {
+  assert.equal(transformable("床前明月光，疑是地上霜。举头望明月，低头思故乡。", "五言绝句"), true);
+  const lines = poemLines(
+    "床前明月光，疑是地上霜。举头望明月，低头思故乡。",
+    "五言绝句"
+  );
+  assert.ok(lines);
+  assert.equal(lines!.length, 2); // 2 联
+  // 第一联：出句=床前明月光，对句=疑是地上霜
+  assert.equal(lines![0][0].chars, "床前明月光");
+  assert.equal(lines![0][1].chars, "疑是地上霜");
+});
+
+test("poemLines 非近体诗体裁返回 null", () => {
+  assert.equal(poemLines("红藕香残玉簟秋，轻解罗裳", "词"), null);
+  assert.equal(poemLines("", "五言绝句"), null);
 });

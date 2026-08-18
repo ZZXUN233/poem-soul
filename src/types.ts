@@ -20,6 +20,9 @@ export interface Poem {
   content: string;
 }
 
+/** 命中的字段类型 */
+export type MatchKind = "title" | "author" | "content";
+
 /** 单个搜索结果命中（多字段高亮 + 正文片段） */
 export interface SearchHit {
   poem: Poem;
@@ -29,8 +32,10 @@ export interface SearchHit {
   authorMarked?: string;
   /** 正文命中时截取的关键词上下文片段（含 <mark>），未命中正文则缺省 */
   snippet?: string;
-  /** 命中类型，用于排序与展示标注 */
-  matchKind: "title" | "author" | "content";
+  /** 命中的字段集合（一首可同时命中标题+正文），用于「命中X」tab 过滤 */
+  fields: MatchKind[];
+  /** 最高优先命中字段（标题>作者>正文），用于展示角标与排序 */
+  matchKind: MatchKind;
   /**
    * 内部使用：相关度得分（仅 searchPoems 内部赋值，构造响应时剥离）。
    * 不作为 API 契约字段。
@@ -46,6 +51,8 @@ export interface SearchQuery {
   dynasty?: string;
   /** 精确体裁过滤（可选） */
   form?: string;
+  /** 仅返回命中该字段的结果（title/author/content），缺省=全部 */
+  match?: MatchKind;
   /** 页码，从 1 开始 */
   page?: number;
   /** 每页条数 */

@@ -66,6 +66,26 @@ export async function getSeeds(): Promise<Poem[]> {
   return getCollection("poems");
 }
 
+/** 简单确定性字符串哈希（0 ~ 2^32-1），用于按 seed 选诗 */
+function hashSeed(seed: string): number {
+  let h = 0;
+  for (let i = 0; i < seed.length; i++) {
+    h = (h * 31 + seed.charCodeAt(i)) >>> 0;
+  }
+  return h;
+}
+
+/**
+ * 按 seed 从全库确定性选取一首诗。
+ * seed 缺省可用今日日期（YYYY-MM-DD）实现「每日一首」；
+ * 换 seed 即得到不同的诗（供「重摇」）。
+ */
+export async function getPoemBySeed(seed: string): Promise<Poem> {
+  const index = await getSearchIndex();
+  const idx = hashSeed(seed) % index.length;
+  return index[idx];
+}
+
 /** 列出收藏集元数据（不含种子，种子单独列） */
 export function getCollectionList(meta: CorpusMeta): CollectionMeta[] {
   return meta.collections.filter((c) => c.key !== "poems");

@@ -7,7 +7,7 @@
  * 不引入中文分词/倒排依赖，保持离线、简单、可控。
  */
 
-import type { Poem, SearchHit, SearchQuery, SearchResponse } from "@/types";
+import type { MatchKind, Poem, SearchHit, SearchQuery, SearchResponse } from "@/types";
 
 /**
  * 在文本中查找关键词所有出现的位置（不重叠，索引最大匹配窗口 3 字）。
@@ -97,11 +97,12 @@ function scorePoem(poem: Poem, kw: string): number {
 /**
  * 核心搜索。给定关键词与过滤条件，返回按相关度排序后的完整命中列表（未分页）。
  * 这是一个"研究性"函数，基于传入的 poems 数组（由调用方提供，便于注入/测试）。
+ * filters.match 可指定仅返回命中该字段（title/author/content）的结果。
  */
 export function searchPoems(
   poems: Poem[],
   kw: string,
-  filters: { dynasty?: string; form?: string } = {}
+  filters: { dynasty?: string; form?: string; match?: MatchKind } = {}
 ): SearchHit[] {
   const results: SearchHit[] = [];
 
@@ -110,13 +111,22 @@ export function searchPoems(
     if (filters.dynasty && poem.dynasty !== filters.dynasty) continue;
     if (filters.form && poem.form !== filters.form) continue;
 
-    // 匹配判定 + 打分（仅当至少一个字段命中）
+    // 匹配判定：记录命中的字段集合
     const titlePos = poem.title.includes(kw) ? findAllPositions(poem.title, kw) : [];
     const authorPos = poem.author.includes(kw) ? findAllPositions(poem.author, kw) : [];
     const contentPos = poem.content.includes(kw) ? findAllPositions(poem.content, kw) : [];
     if (titlePos.length === 0 && authorPos.length === 0 && contentPos.length === 0) continue;
 
-    let matchKind: SearchHit["matchKind"];
+    const fields: MatchKind[] = [];
+    if (titlePos.length) fields.push("title");
+    if (authorPos.length) fields.push("author");
+    if (contentPos.length) fields.push("content");
+
+    // 命中字段过滤（tab）
+    if (filters.match && !fields.includes(filters.match)) continue;
+
+    // 最高优先命中字段：标题 > 作者 > 正文
+    let matchKind: MatchKind;
     let score = 0;
     if (titlePos.length) {
       matchKind = "title";
@@ -129,7 +139,7 @@ export function searchPoems(
       score = contentPos.length;
     }
 
-    const hit: SearchHit = { poem, matchKind, score };
+    const hit: SearchHit = { poem, fields, matchKind, score };
     if (titlePos.length) hit.titleMarked = markKeyword(poem.title, kw);
     if (authorPos.length) hit.authorMarked = markKeyword(poem.author, kw);
     if (contentPos.length) {

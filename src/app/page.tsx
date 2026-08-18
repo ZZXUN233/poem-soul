@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { getCollectionList, getMeta, getSeeds } from "@/lib/corpus";
+import { getMeta, getSeeds } from "@/lib/corpus";
 import PoemCard from "@/components/PoemCard";
 import Bookshelf from "@/components/Bookshelf";
+import DailyPoem from "@/components/DailyPoem";
 
 export const dynamic = "force-dynamic";
 
@@ -13,7 +14,6 @@ interface HomePageProps {
 export default async function HomePage({ searchParams }: HomePageProps) {
   const sp = await searchParams;
   const meta = await getMeta();
-  const collections = getCollectionList(meta);
   const seeds = await getSeeds();
   const initialCollection = sp.collection ?? "";
 
@@ -29,11 +29,6 @@ export default async function HomePage({ searchParams }: HomePageProps) {
             首诗词
           </div>
           <div>
-            <b>{collections.length}</b>
-            <br />
-            部诗卷
-          </div>
-          <div>
             <b>{meta.totalChars.toLocaleString()}</b>
             <br />
             字正文
@@ -41,21 +36,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         </div>
       </section>
 
-      <section>
-        <h2 className="section-title">诗卷</h2>
-        <div className="collection-grid">
-          {collections.map((c) => (
-            <Link
-              key={c.key}
-              href={`/?collection=${c.key}`}
-              className="collection-card"
-            >
-              <div className="cc-name">{c.label}</div>
-              <div className="cc-count">{c.count.toLocaleString()} 首</div>
-            </Link>
-          ))}
-        </div>
-      </section>
+      <DailyPoem />
 
       <Bookshelf
         dynasties={meta.allDynasties}
