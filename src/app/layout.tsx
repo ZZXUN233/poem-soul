@@ -23,7 +23,6 @@ export default function RootLayout({
               </span>
             </Link>
             <nav className="header-nav">
-              <Link href="/">书架</Link>
               <Link href="/search">搜索</Link>
             </nav>
           </div>

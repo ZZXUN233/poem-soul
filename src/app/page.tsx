@@ -1,6 +1,4 @@
-import Link from "next/link";
-import { getMeta, getSeeds } from "@/lib/corpus";
-import PoemCard from "@/components/PoemCard";
+import { getMeta } from "@/lib/corpus";
 import Bookshelf from "@/components/Bookshelf";
 import DailyPoem from "@/components/DailyPoem";
 
@@ -14,7 +12,6 @@ interface HomePageProps {
 export default async function HomePage({ searchParams }: HomePageProps) {
   const sp = await searchParams;
   const meta = await getMeta();
-  const seeds = await getSeeds();
   const initialCollection = sp.collection ?? "";
 
   return (
@@ -43,13 +40,6 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         forms={meta.allForms}
         initialCollection={initialCollection}
       />
-
-      <h2 className="section-title">精选</h2>
-      <div className="poem-list">
-        {seeds.map((poem) => (
-          <PoemCard key={poem.id} poem={poem} />
-        ))}
-      </div>
     </>
   );
 }

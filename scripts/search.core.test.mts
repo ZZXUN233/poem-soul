@@ -15,6 +15,7 @@ import {
   searchPoems,
 } from "../src/lib/search";
 import { poemLines, transformable } from "../src/lib/format";
+import { getRelatedBatch, getRelatedPoems } from "../src/lib/related";
 import type { Poem } from "../src/types";
 
 const poem: Poem = {
@@ -188,4 +189,138 @@ test("poemLines 对仗分组：五言绝句切成 2 联", () => {
 test("poemLines 非近体诗体裁返回 null", () => {
   assert.equal(poemLines("红藕香残玉簟秋，轻解罗裳", "词"), null);
   assert.equal(poemLines("", "五言绝句"), null);
+});
+
+// 相关推荐测试语料
+const relIndex: Poem[] = [
+  { id: "tang-000001", title: "静夜思", author: "李白", dynasty: "唐", form: "五言绝句", content: "A。" },
+  { id: "tang-000002", title: "春晓", author: "孟浩然", dynasty: "唐", form: "五言绝句", content: "B。" },
+  { id: "song_ci-0001", title: "静夜思", author: "李白", dynasty: "唐", form: "五言绝句", content: "C。" },
+  { id: "tang-000003", title: "春晓", author: "孟浩然", dynasty: "唐", form: "五言绝句", content: "D。" },
+  { id: "wudai-0001", title: "静夜思", author: "李白", dynasty: "唐", form: "五言绝句", content: "E。" },
+];
+
+test("getRelatedPoems：同类/同作者/同名都排除自身", () => {
+  const me = relIndex[0]; // 静夜思 / 李白 / 五言绝句
+  const r = getRelatedPoems(me, relIndex);
+
+  // 同类（五言绝句）：其余 4 首都是五言绝句
+  assert.ok(r.form.every((p) => p.form === "五言绝句"));
+  assert.ok(r.form.every((p) => p.id !== me.id));
+  // 同作者（李白）：2 首
+  assert.ok(r.author.every((p) => p.author === "李白"));
+  assert.ok(r.author.every((p) => p.id !== me.id));
+  // 同名（静夜思）：2 首
+  assert.ok(r.title.every((p) => p.title === "静夜思"));
+  assert.ok(r.title.every((p) => p.id !== me.id));
+});
+
+test("getRelatedPoems：无名氏作者不参与同作者推荐", () => {
+  const anon: Poem = {
+    id: "tang-0010",
+    title: "x",
+    author: "无名氏",
+    dynasty: "唐",
+    form: "五言绝句",
+    content: "y。",
+  };
+  const pool: Poem[] = [anon, relIndex[0]];
+  const r = getRelatedPoems(anon, pool);
+  assert.equal(r.author.length, 0, "无名氏不应有同作者推荐");
+  assert.equal(r.form.length, 1, "同类仍正常");
+});
+
+test("getRelatedPoems：数量不超过上限 LIMIT=4", () => {
+  // 10 首同作者（白居易）+ 一首当前诗（也是白居易）
+  const pool: Poem[] = Array.from({ length: 10 }, (_, i) => ({
+    id: `tang-${String(100 + i)}`,
+    title: `t${i}`,
+    author: "白居易",
+    dynasty: "唐",
+    form: "五言绝句",
+    content: `${i}`,
+  }));
+  const me: Poem = {
+    id: "me-0",
+    title: "当前",
+    author: "白居易",
+    dynasty: "唐",
+    form: "五言绝句",
+    content: "z",
+  };
+  const r = getRelatedPoems(me, [...pool, me]);
+  // 同作者 10 首 → 截取不超过 4，且排除自身
+  assert.ok(r.author.length <= 4);
+  assert.ok(r.author.length > 0);
+  assert.ok(r.author.every((p) => p.id !== me.id));
+  // 同类（五言绝句）10 首 → 截取不超过 4
+  assert.ok(r.form.length <= 4);
+  assert.ok(r.form.length > 0);
+});
+
+test("getRelatedBatch：按字段取批、排除自身、LIMIT 上限", () => {
+  // 10 首同作者（李白），1 首当前诗（也是李白）
+  const authors: Poem[] = Array.from({ length: 10 }, (_, i) => ({
+    id: `tang-z${i}`,
+    title: `t${i}`,
+    author: "李白",
+    dynasty: "唐",
+    form: "五言绝句",
+    content: `${i}`,
+  }));
+  const me: Poem = {
+    id: "me-1",
+    title: "当前",
+    author: "李白",
+    dynasty: "唐",
+    form: "五言绝句",
+    content: "z",
+  };
+  const pool = [...authors, me];
+
+  const batch = getRelatedBatch(me, pool, "author", "s1");
+  assert.ok(batch.length <= 4, "每批不超过 LIMIT");
+  assert.ok(batch.length > 0);
+  assert.ok(batch.every((p) => p.author === "李白"), "该字段只含同作者");
+  assert.ok(batch.every((p) => p.id !== me.id), "排除自身");
+
+  // 不相关的字段返回空
+  assert.equal(getRelatedBatch(me, pool, "title", "s1").length, 0);
+});
+
+test("getRelatedBatch：不同 seed 得到不同批", () => {
+  const pool: Poem[] = Array.from({ length: 50 }, (_, i) => ({
+    id: `tang-b${i}`,
+    title: `t${i}`,
+    author: "杜甫",
+    dynasty: "唐",
+    form: "七言绝句",
+    content: `${i}`,
+  }));
+  const me: Poem = {
+    id: "me-2",
+    title: "当前",
+    author: "杜甫",
+    dynasty: "唐",
+    form: "七言绝句",
+    content: "z",
+  };
+  const full = [...pool, me];
+
+  const a = getRelatedBatch(me, full, "author", "seed-a");
+  const a2 = getRelatedBatch(me, full, "author", "seed-a");
+  const b = getRelatedBatch(me, full, "author", "seed-b");
+
+  assert.deepEqual(
+    a.map((p) => p.id),
+    a2.map((p) => p.id),
+    "同 seed 批相同"
+  );
+  const idsA = new Set(a.map((p) => p.id));
+  const idsB = new Set(b.map((p) => p.id));
+  const overlap = a.filter((p) => idsB.has(p.id)).length;
+  assert.ok(
+    overlap < a.length,
+    "不同 seed 应产生不同批次（允许少量重叠）"
+  );
 });

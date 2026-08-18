@@ -203,7 +203,7 @@ function mulberry32(seed: number): () => number {
 }
 
 /** 按 seed 确定性洗牌（Fisher-Yates），同一 seed 得到相同顺序便于稳定分页 */
-function seededShuffle<T>(arr: T[], seed: string): T[] {
+export function seededShuffle<T>(arr: T[], seed: string): T[] {
   const rng = mulberry32(hashString(seed));
   const out = arr.slice();
   for (let i = out.length - 1; i > 0; i--) {
