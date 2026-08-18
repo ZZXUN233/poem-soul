@@ -5,8 +5,10 @@ import FilterBar from "./FilterBar";
 import Pagination from "./Pagination";
 import PoemCard from "./PoemCard";
 import type { Poem } from "@/types";
+import type { Mode } from "@/lib/mode";
 
 interface BookshelfProps {
+  mode: Mode;
   dynasties: string[];
   forms: string[];
   initialCollection?: string;
@@ -20,6 +22,7 @@ interface BrowseResult {
 }
 
 export default function Bookshelf({
+  mode,
   dynasties,
   forms,
   initialCollection = "",
@@ -48,6 +51,7 @@ export default function Bookshelf({
     ) => {
       setLoading(true);
       const params = new URLSearchParams({
+        mode,
         page: String(pg),
         pageSize: "20",
         sort: "random",
@@ -64,7 +68,7 @@ export default function Bookshelf({
         setLoading(false);
       }
     },
-    []
+    [mode]
   );
 
   useEffect(() => {
@@ -107,7 +111,7 @@ export default function Bookshelf({
           ) : (
             <div className="poem-list">
               {result.items.map((poem) => (
-                <PoemCard key={poem.id} poem={poem} />
+                <PoemCard key={poem.id} poem={poem} mode={mode} />
               ))}
             </div>
           )}

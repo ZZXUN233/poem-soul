@@ -16,5 +16,8 @@ yarn-debug.log*
 yarn-error.log*
 
 # typescript
-# 保留 *.tsbuildinfo 忽略；public/data/ 语料数据现随仓库提交（自包含可运行）
+# 保留 *.tsbuildinfo 忽略；public/data/{classic,modern} 语料数据现随仓库提交（自包含可运行）
 *.tsbuildinfo
+
+# 现代诗源数据缓存（下载/解压临时物，不入库）
+/scripts/.cache/

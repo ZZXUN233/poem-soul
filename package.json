@@ -5,6 +5,8 @@
   "description": "诗魂 · Poem Soul —— 基于离线语料的古诗词索引 / 展示 / 阅读 Web 应用",
   "scripts": {
     "build:data": "node scripts/build-data.mjs",
+    "build:modern": "node scripts/build-modern.mjs",
+    "build:all": "npm run build:data && npm run build:modern",
     "test": "tsx --test scripts/search.core.test.mts",
     "dev": "next dev",
     "build": "next build",

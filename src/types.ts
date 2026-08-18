@@ -12,12 +12,14 @@ export interface Poem {
   title: string;
   /** 作者 */
   author: string;
-  /** 朝代，如 "唐"、"宋"、"元" */
+  /** 朝代，如 "唐"、"宋"、"元"（现代诗恒为 "现代"） */
   dynasty: string;
   /** 体裁，如 "五言绝句"、"词"、"曲"、"诗经"、"楚辞"，可为 ""（未知） */
   form: string;
-  /** 清洗后的正文，一句到底（无空白、全角标点） */
+  /** 清洗后的正文，一句到底（无空白、全角标点）；现代诗保留换行 */
   content: string;
+  /** 写作年份（现代诗取自源 date 字段，如 "1979"），可为空 */
+  year?: string;
 }
 
 /** 命中的字段类型 */
@@ -67,6 +69,23 @@ export interface SearchResponse {
   pageSize: number;
   totalPages: number;
   hits: SearchHit[];
+}
+
+/** 跨库搜索：单个语料库（古诗词/现代诗）的结果分组 */
+export interface SearchGroup {
+  mode: "classic" | "modern";
+  /** 分组展示名，如 "古诗词" / "现代诗" */
+  label: string;
+  total: number;
+  page: number;
+  totalPages: number;
+  hits: SearchHit[];
+}
+
+/** 跨库搜索 API 响应（同时检索古诗词 + 现代诗，分组返回） */
+export interface GroupSearchResponse {
+  q: string;
+  groups: SearchGroup[];
 }
 
 /** 单个诗集的元数据（由 build-data.mjs 写入 meta.json） */

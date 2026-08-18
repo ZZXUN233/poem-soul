@@ -5,10 +5,12 @@ import Link from "next/link";
 import type { Poem } from "@/types";
 import type { RelatedField, RelatedPoems } from "@/lib/related";
 import { hasRelated } from "@/lib/related";
+import { poemHref, type Mode } from "@/lib/mode";
 
 interface RelatedSectionProps {
   poem: Poem;
   initialRelated: RelatedPoems;
+  mode: Mode;
 }
 
 /** 词/曲的 title 即词牌/曲牌，「同名」应表述为「同词牌/同曲牌」 */
@@ -28,6 +30,7 @@ interface GroupDef {
 export default function RelatedSection({
   poem,
   initialRelated,
+  mode,
 }: RelatedSectionProps) {
   const [related, setRelated] = useState<RelatedPoems>(initialRelated);
   const [loading, setLoading] = useState<RelatedField | null>(null);
@@ -51,7 +54,9 @@ export default function RelatedSection({
     try {
       const seed = Math.random().toString(36).slice(2);
       const res = await fetch(
-        `/api/related?id=${encodeURIComponent(poem.id)}&field=${field}&seed=${seed}`
+        `/api/related?mode=${encodeURIComponent(mode)}&id=${encodeURIComponent(
+          poem.id
+        )}&field=${field}&seed=${seed}`
       );
       if (!res.ok) return;
       const data = (await res.json()) as { items: Poem[] };
@@ -82,10 +87,15 @@ export default function RelatedSection({
           </div>
           <div className="related-list">
             {related[g.field].map((p) => (
-              <Link key={p.id} href={`/poem/${p.id}`} className="related-item">
+              <Link
+                key={p.id}
+                href={poemHref(p.id, mode)}
+                className="related-item"
+              >
                 <span className="related-item-title">{p.title}</span>
                 <span className="related-item-author">
-                  {p.author} · {p.dynasty}
+                  {p.author}
+                  {p.year ? ` · ${p.year}` : ""}
                 </span>
               </Link>
             ))}

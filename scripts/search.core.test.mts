@@ -324,3 +324,61 @@ test("getRelatedBatch：不同 seed 得到不同批", () => {
     "不同 seed 应产生不同批次（允许少量重叠）"
   );
 });
+
+// ===== mode.ts 纯函数 =====
+import {
+  DEFAULT_MODE,
+  isMode,
+  modeHref,
+  poemHref,
+  resolveMode,
+  storeMode,
+} from "../src/lib/mode";
+
+test("isMode 校验", () => {
+  assert.equal(isMode("classic"), true);
+  assert.equal(isMode("modern"), true);
+  assert.equal(isMode("foo"), false);
+  assert.equal(isMode(undefined), false);
+  assert.equal(isMode(null), false);
+});
+
+test("resolveMode 缺省回退", () => {
+  assert.equal(resolveMode("modern"), "modern");
+  assert.equal(resolveMode("classic"), "classic");
+  assert.equal(resolveMode("bogus"), DEFAULT_MODE);
+  // Node 无 window，故 undefined 回退到默认 classic
+  assert.equal(resolveMode(undefined), DEFAULT_MODE);
+});
+
+test("modeHref 拼接 query", () => {
+  assert.equal(modeHref("/poem/tang-000001", "modern"), "/poem/tang-000001?mode=modern");
+  assert.equal(modeHref("/search?q=月", "modern"), "/search?q=%E6%9C%88&mode=modern");
+  assert.equal(modeHref("/", "modern"), "/?mode=modern");
+  assert.equal(modeHref("/poem/tang-000001", "classic"), "/poem/tang-000001?mode=classic");
+});
+
+test("modeHref 替换已有 mode 参数（避免重复）", () => {
+  // 模式开关在已带 mode 的页面上切换，应替换而非追加
+  assert.equal(
+    modeHref("/search?q=%E6%9C%88&mode=modern", "classic"),
+    "/search?q=%E6%9C%88&mode=classic"
+  );
+  assert.equal(
+    modeHref("/search?mode=modern", "classic"),
+    "/search?mode=classic"
+  );
+  assert.equal(
+    modeHref("/search?q=xx&mode=classic&page=2", "modern"),
+    "/search?q=xx&mode=modern&page=2"
+  );
+});
+
+test("poemHref 默认模式下 URL 干净", () => {
+  assert.equal(poemHref("tang-000001", "classic"), "/poem/tang-000001");
+  assert.equal(poemHref("xian_dai-000001", "modern"), "/poem/xian_dai-000001?mode=modern");
+});
+
+test("storeMode 无 window 安全（Node 环境不抛错）", () => {
+  assert.doesNotThrow(() => storeMode("modern"));
+});

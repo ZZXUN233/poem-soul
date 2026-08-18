@@ -6,7 +6,7 @@ import SearchBar from "@/components/SearchBar";
 import FilterBar from "@/components/FilterBar";
 import Pagination from "@/components/Pagination";
 import PoemCard from "@/components/PoemCard";
-import type { MatchKind, SearchHit, SearchResponse } from "@/types";
+import type { GroupSearchResponse, MatchKind, SearchGroup, SearchHit } from "@/types";
 
 /** 命中 tab 选项 */
 const MATCH_TABS: { key: MatchKind | ""; label: string }[] = [
@@ -16,7 +16,7 @@ const MATCH_TABS: { key: MatchKind | ""; label: string }[] = [
   { key: "content", label: "命中正文" },
 ];
 
-/** 搜索页客户端：URL 驱动（q/dynasty/form/match/page），可分享/直达 */
+/** 搜索页客户端：跨库检索（古诗词 + 现代诗），按语料库分组展示；URL 驱动可分享 */
 export default function SearchPage({
   dynasties,
   forms,
@@ -37,7 +37,7 @@ export default function SearchPage({
       : "";
   const page = Number(params.get("page") ?? 1) || 1;
 
-  const [result, setResult] = useState<SearchResponse | null>(null);
+  const [result, setResult] = useState<GroupSearchResponse | null>(null);
   const [loading, setLoading] = useState(false);
 
   const syncUrl = useCallback(
@@ -83,7 +83,7 @@ export default function SearchPage({
       if (mt) sp.set("match", mt);
       try {
         const res = await fetch(`/api/search?${sp.toString()}`);
-        const data = (await res.json()) as SearchResponse;
+        const data = (await res.json()) as GroupSearchResponse;
         setResult(data);
       } finally {
         setLoading(false);
@@ -95,6 +95,8 @@ export default function SearchPage({
   useEffect(() => {
     if (q) {
       doSearch(q, dynasty, form, match, page);
+    } else {
+      setResult(null);
     }
   }, [q, dynasty, form, match, page, doSearch]);
 
@@ -119,7 +121,7 @@ export default function SearchPage({
 
       {!q && (
         <div className="notice">
-          输入标题、作者或诗句，在全唐诗、宋词、元曲等 7.6 万余首中检索。
+          输入标题、作者或诗句，同时检索古诗词与现代诗语料库。
         </div>
       )}
 
@@ -128,7 +130,8 @@ export default function SearchPage({
       {!loading && result && (
         <>
           <div className="search-meta">
-            关键词「{result.q}」共命中 {result.total.toLocaleString()} 首
+            关键词「{result.q}」共命中{" "}
+            {result.groups.reduce((n, g) => n + g.total, 0).toLocaleString()} 首
           </div>
 
           <div className="match-tabs">
@@ -143,30 +146,56 @@ export default function SearchPage({
             ))}
           </div>
 
-          {result.total === 0 ? (
+          {result.groups.every((g) => g.total === 0) ? (
             <div className="empty">未找到匹配的诗词，换个关键词试试</div>
           ) : (
-            <div className="poem-list">
-              {result.hits.map((hit: SearchHit) => (
-                <PoemCard
-                  key={hit.poem.id}
-                  poem={hit.poem}
-                  snippet={hit.snippet}
-                  titleMarked={hit.titleMarked}
-                  authorMarked={hit.authorMarked}
-                  matchKind={hit.matchKind}
-                />
-              ))}
-            </div>
+            result.groups.map((group) => (
+              <SearchGroupSection
+                key={group.mode}
+                group={group}
+                onPageChange={(pg) => syncUrl({ page: pg })}
+              />
+            ))
           )}
-          <Pagination
-            page={result.page}
-            totalPages={result.totalPages}
-            onPageChange={(pg) => syncUrl({ page: pg })}
-          />
         </>
       )}
     </>
   );
 }
 
+function SearchGroupSection({
+  group,
+  onPageChange,
+}: {
+  group: SearchGroup;
+  onPageChange: (page: number) => void;
+}) {
+  if (group.total === 0) return null;
+
+  return (
+    <section className="search-group">
+      <h2 className="section-title">
+        {group.label}
+        <span className="search-group-count">{group.total.toLocaleString()} 首</span>
+      </h2>
+      <div className="poem-list">
+        {group.hits.map((hit: SearchHit) => (
+          <PoemCard
+            key={`${group.mode}-${hit.poem.id}`}
+            poem={hit.poem}
+            mode={group.mode}
+            snippet={hit.snippet}
+            titleMarked={hit.titleMarked}
+            authorMarked={hit.authorMarked}
+            matchKind={hit.matchKind}
+          />
+        ))}
+      </div>
+      <Pagination
+        page={group.page}
+        totalPages={group.totalPages}
+        onPageChange={onPageChange}
+      />
+    </section>
+  );
+}

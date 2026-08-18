@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 /**
- * build-data.mjs —— 诗魂 Web 语料迁移脚本
+ * build-data.mjs —— 诗魂 Web 古诗词语料迁移脚本
  *
  * 读取 Android 侧已清洗语料（app/src/main/assets/corpus/*.json.gz 及 poems.json），
- * 解压、分配稳定 id、按集拆分，产出 Web 项目 public/data/ 下的：
+ * 解压、分配稳定 id、按集拆分，产出 Web 项目 public/data/classic/ 下的：
  *   - meta.json          全局概览（各集记录数 / 朝代 / 体裁）
  *   - poems/<set>.json   每集一个 JSON 数组（完整 Poem 记录，可供阅读页/浏览）
  *   - index/search.json  全文搜索索引（保留 content 供服务端线性扫描）
@@ -22,8 +22,8 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, "..");
 // 语料源（母工程 Android assets）
 const CORPUS_SRC = join(ROOT, "..", "app", "src", "main", "assets", "corpus");
-// 输出根
-const DATA_DIR = join(ROOT, "public", "data");
+// 输出根（古诗词 → classic/）
+const DATA_DIR = join(ROOT, "public", "data", "classic");
 const POEMS_DIR = join(DATA_DIR, "poems");
 const INDEX_DIR = join(DATA_DIR, "index");
 

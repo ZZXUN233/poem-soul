@@ -97,6 +97,40 @@ a {
   color: var(--accent);
 }
 
+/* ===== 语料模式开关 ===== */
+.mode-toggle {
+  display: inline-flex;
+  gap: 0;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.mode-pill {
+  background: transparent;
+  border: none;
+  color: var(--ink-soft);
+  font-family: var(--serif);
+  font-size: 14px;
+  line-height: 1;
+  padding: 6px 13px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.mode-pill + .mode-pill {
+  border-left: 1px solid var(--line);
+}
+
+.mode-pill:hover {
+  color: var(--accent);
+}
+
+.mode-pill.active {
+  background: var(--accent);
+  color: var(--paper);
+}
+
 /* ===== 主体 ===== */
 .site-main {
   padding-top: 28px;
@@ -364,6 +398,7 @@ mark {
 }
 
 .pagination button,
+.pagination a,
 .pagination span.page-link {
   padding: 6px 14px;
   border: 1px solid var(--line);
@@ -373,14 +408,17 @@ mark {
   cursor: pointer;
   font-family: var(--serif);
   font-size: 14px;
+  text-decoration: none;
 }
 
-.pagination button:disabled {
+.pagination button:disabled,
+.pagination .disabled {
   opacity: 0.4;
   cursor: not-allowed;
 }
 
-.pagination button:hover:not(:disabled) {
+.pagination button:hover:not(:disabled),
+.pagination a:hover {
   border-color: var(--accent-soft);
   color: var(--accent);
 }
@@ -409,6 +447,16 @@ mark {
   margin-bottom: 6px;
 }
 
+.reader-author {
+  color: var(--accent);
+  border-bottom: 1px dashed var(--accent-soft);
+  transition: border-color 0.15s;
+}
+
+.reader-author:hover {
+  border-bottom-style: solid;
+}
+
 .reader-badges {
   color: var(--ink-faint);
   font-size: 14px;
@@ -423,6 +471,13 @@ mark {
   line-height: 2.2;
   letter-spacing: 1px;
   white-space: pre-line;
+}
+
+/* 现代诗正文左对齐（标题/作者/徽标仍居中） */
+.reader-modern .reader-content {
+  text-align: left;
+  max-width: 34em;
+  margin: 0 auto;
 }
 
 /* ===== 近体诗对仗对齐 ===== */
@@ -532,6 +587,18 @@ mark {
   font-weight: 600;
   margin: 22px 0 4px;
   color: var(--ink);
+}
+
+/* ===== 跨库搜索分组 ===== */
+.search-group {
+  margin-top: 8px;
+}
+
+.search-group-count {
+  margin-left: 10px;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--ink-faint);
 }
 
 /* ===== 分享操作栏 ===== */

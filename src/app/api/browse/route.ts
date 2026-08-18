@@ -1,16 +1,18 @@
 import { NextRequest } from "next/server";
 import { getSearchIndex } from "@/lib/corpus";
 import { browsePoems } from "@/lib/search";
+import { resolveMode } from "@/lib/mode";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 /**
- * GET /api/browse?collection=&dynasty=&form=&sort=random&seed=&page=&pageSize=
+ * GET /api/browse?mode=&collection=&dynasty=&form=&sort=random&seed=&page=&pageSize=
  * 书架/浏览：无关键字，按 集/朝代/体裁 过滤 + 排序 + 分页。
  */
 export async function GET(request: NextRequest) {
   const sp = request.nextUrl.searchParams;
+  const mode = resolveMode(sp.get("mode"));
   const collection = sp.get("collection") || undefined;
   const dynasty = sp.get("dynasty") || undefined;
   const form = sp.get("form") || undefined;
@@ -20,7 +22,7 @@ export async function GET(request: NextRequest) {
   const pageSize = Number(sp.get("pageSize") ?? 20);
 
   try {
-    const poems = await getSearchIndex();
+    const poems = await getSearchIndex(mode);
     const result = browsePoems(poems, {
       collection,
       dynasty,

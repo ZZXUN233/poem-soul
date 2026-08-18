@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Suspense } from "react";
+import ModeToggle from "@/components/ModeToggle";
 import "./globals.css";
 
 export const metadata: Metadata = {
   title: "诗魂 · Poem Soul",
   description:
-    "基于离线语料的古诗词索引、展示与阅读 Web 应用。内置诗经、楚辞、全唐诗、宋词、元曲等 7.6 万余首公版诗词。",
+    "基于离线语料的古诗词与现代诗索引、展示与阅读 Web 应用。内置全唐诗、宋词、元曲等古诗词及现代诗语料，本地离线。",
 };
 
 export default function RootLayout({
@@ -23,6 +25,9 @@ export default function RootLayout({
               </span>
             </Link>
             <nav className="header-nav">
+              <Suspense>
+                <ModeToggle />
+              </Suspense>
               <Link href="/search">搜索</Link>
             </nav>
           </div>
@@ -30,7 +35,7 @@ export default function RootLayout({
         <main className="container site-main">{children}</main>
         <footer className="site-footer">
           <div className="container">
-            语料来自{" "}
+            古诗词语料来自{" "}
             <a
               href="https://github.com/chinese-poetry/chinese-poetry"
               target="_blank"
@@ -38,7 +43,15 @@ export default function RootLayout({
             >
               chinese-poetry
             </a>
-            （MIT），本地离线 · 诗魂 Poem Soul
+            ，现代诗语料来自{" "}
+            <a
+              href="https://github.com/sheepzh/poetry"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              sheepzh/poetry
+            </a>
+            ，均以开源/MIT 协议本地离线 · 诗魂 Poem Soul
           </div>
         </footer>
       </body>

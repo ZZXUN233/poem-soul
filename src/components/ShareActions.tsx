@@ -18,9 +18,14 @@ function readableContent(poem: Poem): string {
 
 /** 分享/复制用的完整文本 */
 function buildShareText(poem: Poem, url: string): string {
-  return `${poem.title}\n${poem.author} · ${poem.dynasty} · ${
-    poem.form || "体裁未知"
-  }\n\n${readableContent(poem)}\n\n—— 来自 诗魂 Poem Soul\n${url}`;
+  const meta = [
+    poem.dynasty,
+    poem.year,
+    poem.form || "体裁未知",
+  ]
+    .filter(Boolean)
+    .join(" · ");
+  return `${poem.title}\n${poem.author} · ${meta}\n\n${readableContent(poem)}\n\n—— 来自 诗魂 Poem Soul\n${url}`;
 }
 
 /** 阅读页操作栏：复制内容 / 截图分享 / 复制链接 */
@@ -110,7 +115,7 @@ export default function ShareActions({ poem }: { poem: Poem }) {
         <div ref={shareCardRef} className="share-card">
           <div className="share-card-title">{poem.title}</div>
           <div className="share-card-meta">
-            {poem.author} · {poem.dynasty} · {poem.form || "体裁未知"}
+            {poem.author} · {[poem.dynasty, poem.year, poem.form || "体裁未知"].filter(Boolean).join(" · ")}
           </div>
           <ShareCardBody poem={poem} />
           <div className="share-card-brand">

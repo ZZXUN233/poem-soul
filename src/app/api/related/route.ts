@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { getPoemById, getSearchIndex } from "@/lib/corpus";
 import { getRelatedBatch, type RelatedField } from "@/lib/related";
+import { resolveMode } from "@/lib/mode";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -8,11 +9,12 @@ export const dynamic = "force-dynamic";
 const FIELDS = new Set<RelatedField>(["form", "author", "title"]);
 
 /**
- * GET /api/related?id=<poemId>&field=<form|author|title>&seed=<random>
+ * GET /api/related?mode=&id=<poemId>&field=<form|author|title>&seed=<random>
  * 取某一类相关推荐的一批。「换一批」= 携带新 seed 请求新一批。
  */
 export async function GET(request: NextRequest) {
   const sp = request.nextUrl.searchParams;
+  const mode = resolveMode(sp.get("mode"));
   const id = sp.get("id") ?? "";
   const field = sp.get("field") as RelatedField | null;
   const seed = sp.get("seed");
@@ -25,11 +27,11 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const poem = await getPoemById(id);
+    const poem = await getPoemById(mode, id);
     if (!poem) {
       return Response.json({ field, items: [] });
     }
-    const index = await getSearchIndex();
+    const index = await getSearchIndex(mode);
     const items = getRelatedBatch(poem, index, field, seed);
     return Response.json({ field, items });
   } catch (err) {

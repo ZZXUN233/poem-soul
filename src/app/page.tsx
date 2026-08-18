@@ -1,17 +1,19 @@
 import { getMeta } from "@/lib/corpus";
+import { isMode, type Mode } from "@/lib/mode";
 import Bookshelf from "@/components/Bookshelf";
 import DailyPoem from "@/components/DailyPoem";
 
 export const dynamic = "force-dynamic";
 
 interface HomePageProps {
-  searchParams: Promise<{ collection?: string; page?: string }>;
+  searchParams: Promise<{ collection?: string; page?: string; mode?: string }>;
 }
 
 /** 首页 / 书架 */
 export default async function HomePage({ searchParams }: HomePageProps) {
   const sp = await searchParams;
-  const meta = await getMeta();
+  const mode: Mode = isMode(sp.mode) ? sp.mode : "classic";
+  const meta = await getMeta(mode);
   const initialCollection = sp.collection ?? "";
 
   return (
@@ -33,9 +35,10 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         </div>
       </section>
 
-      <DailyPoem />
+      <DailyPoem mode={mode} />
 
       <Bookshelf
+        mode={mode}
         dynasties={meta.allDynasties}
         forms={meta.allForms}
         initialCollection={initialCollection}

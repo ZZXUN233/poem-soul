@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "generatedAt": "2026-08-18T11:44:04.422Z",
+  "totalPoems": 82204,
+  "totalChars": 17175757,
+  "allDynasties": [
+    "现代"
+  ],
+  "allForms": [
+    "现代诗"
+  ],
+  "collections": [
+    {
+      "key": "xian_dai",
+      "label": "现代诗",
+      "count": 82204,
+      "dynasties": [
+        "现代"
+      ],
+      "forms": [
+        "现代诗"
+      ]
+    }
+  ]
+}

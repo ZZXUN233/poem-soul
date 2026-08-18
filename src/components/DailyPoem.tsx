@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import type { Poem } from "@/types";
 import { poemLines } from "@/lib/format";
+import { poemHref, type Mode } from "@/lib/mode";
 
 /** 今日日期（客户端时区），作为每日定首的 seed */
 function todaySeed(): string {
@@ -14,20 +15,22 @@ function todaySeed(): string {
 }
 
 /** 首页「每日一首」：全诗库随机一首，可重摇换诗 */
-export default function DailyPoem() {
+export default function DailyPoem({ mode }: { mode: Mode }) {
   const [poem, setPoem] = useState<Poem | null>(null);
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async (seed: string) => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/random?seed=${encodeURIComponent(seed)}`);
+      const res = await fetch(
+        `/api/random?mode=${encodeURIComponent(mode)}&seed=${encodeURIComponent(seed)}`
+      );
       const data = (await res.json()) as Poem;
       setPoem(data);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [mode]);
 
   // 首次加载：每日一首（按日期稳定）
   useEffect(() => {
@@ -58,11 +61,13 @@ export default function DailyPoem() {
         <div className="daily-card">
           <div className="reader-title">{poem.title}</div>
           <div className="reader-meta">
-            {poem.author} · {poem.dynasty} · {poem.form || "体裁未知"}
+            {poem.author} · {poem.dynasty}
+            {poem.year ? ` · ${poem.year}` : ""}
+            {poem.form ? ` · ${poem.form}` : ""}
           </div>
           <PoemBody poem={poem} />
           <div className="daily-read">
-            <Link href={`/poem/${poem.id}`}>查看全文 →</Link>
+            <Link href={poemHref(poem.id, mode)}>查看全文 →</Link>
           </div>
         </div>
       )}
