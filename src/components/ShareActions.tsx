@@ -18,11 +18,7 @@ function readableContent(poem: Poem): string {
 
 /** 分享/复制用的完整文本 */
 function buildShareText(poem: Poem, url: string): string {
-  const meta = [
-    poem.dynasty,
-    poem.year,
-    poem.form || "体裁未知",
-  ]
+  const meta = [poem.dynasty, poem.year, poem.form || "体裁未知"]
     .filter(Boolean)
     .join(" · ");
   return `${poem.title}\n${poem.author} · ${meta}\n\n${readableContent(poem)}\n\n—— 来自 诗魂 Poem Soul\n${url}`;
@@ -33,6 +29,7 @@ export default function ShareActions({ poem }: { poem: Poem }) {
   const shareCardRef = useRef<HTMLDivElement>(null);
   const [toast, setToast] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [preview, setPreview] = useState<string | null>(null); // 截图预览 URL
 
   const showToast = (msg: string) => {
     setToast(msg);
@@ -41,7 +38,9 @@ export default function ShareActions({ poem }: { poem: Poem }) {
 
   const copyContent = async () => {
     try {
-      await navigator.clipboard.writeText(buildShareText(poem, window.location.href));
+      await navigator.clipboard.writeText(
+        buildShareText(poem, window.location.href)
+      );
       showToast("已复制诗文");
     } catch {
       showToast("复制失败");
@@ -57,38 +56,55 @@ export default function ShareActions({ poem }: { poem: Poem }) {
     }
   };
 
-  /** 截图分享：把离屏分享卡渲染为 PNG，优先 Web Share，否则下载 */
-  const shareScreenshot = async () => {
+  /** 生成截图并弹出预览 */
+  const generateScreenshot = async () => {
     const node = shareCardRef.current;
     if (!node || busy) return;
     setBusy(true);
     try {
-      const blob = await toBlob(node, { pixelRatio: 2, backgroundColor: "#faf7f0" });
-      if (!blob) throw new Error("no blob");
-      const file = new File([blob], `${poem.title || "poem"}.png`, {
-        type: "image/png",
+      const blob = await toBlob(node, {
+        pixelRatio: 2,
+        backgroundColor: "#faf7f0",
       });
-      const url = window.location.href;
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({
-          files: [file],
-          title: poem.title,
-          text: `${poem.title} · ${poem.author}`,
-        });
-        showToast("已分享");
-      } else {
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(blob);
-        a.download = `${poem.title || "poem"}.png`;
-        a.click();
-        showToast("已生成分享图");
-      }
+      if (!blob) throw new Error("no blob");
+      const url = URL.createObjectURL(blob);
+      setPreview(url);
     } catch {
-      // 用户取消或失败
-      showToast("分享已取消");
+      showToast("截图生成失败");
     } finally {
       setBusy(false);
     }
+  };
+
+  /** 复制截图到剪贴板 */
+  const copyScreenshot = async () => {
+    if (!preview) return;
+    try {
+      const res = await fetch(preview);
+      const blob = await res.blob();
+      await navigator.clipboard.write([
+        new ClipboardItem({ "image/png": blob }),
+      ]);
+      showToast("已复制截图");
+    } catch {
+      showToast("复制失败");
+    }
+  };
+
+  /** 保存截图到本地 */
+  const saveScreenshot = () => {
+    if (!preview) return;
+    const a = document.createElement("a");
+    a.href = preview;
+    a.download = `${poem.title || "poem"}.png`;
+    a.click();
+    showToast("已保存");
+  };
+
+  /** 关闭预览 */
+  const closePreview = () => {
+    if (preview) URL.revokeObjectURL(preview);
+    setPreview(null);
   };
 
   return (
@@ -98,7 +114,7 @@ export default function ShareActions({ poem }: { poem: Poem }) {
           复制内容
         </button>
         <button
-          onClick={shareScreenshot}
+          onClick={generateScreenshot}
           title="生成分享图片"
           className="share-btn"
           disabled={busy}
@@ -115,7 +131,10 @@ export default function ShareActions({ poem }: { poem: Poem }) {
         <div ref={shareCardRef} className="share-card">
           <div className="share-card-title">{poem.title}</div>
           <div className="share-card-meta">
-            {poem.author} · {[poem.dynasty, poem.year, poem.form || "体裁未知"].filter(Boolean).join(" · ")}
+            {poem.author} ·{" "}
+            {[poem.dynasty, poem.year, poem.form || "体裁未知"]
+              .filter(Boolean)
+              .join(" · ")}
           </div>
           <ShareCardBody poem={poem} />
           <div className="share-card-brand">
@@ -123,6 +142,34 @@ export default function ShareActions({ poem }: { poem: Poem }) {
           </div>
         </div>
       </div>
+
+      {/* 截图预览弹窗 */}
+      {preview && (
+        <div className="screenshot-overlay" onClick={closePreview}>
+          <div
+            className="screenshot-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="screenshot-modal-header">
+              <span>截图预览</span>
+              <button className="screenshot-close" onClick={closePreview}>
+                ✕
+              </button>
+            </div>
+            <div className="screenshot-preview">
+              <img src={preview} alt={`${poem.title} 截图`} />
+            </div>
+            <div className="screenshot-actions">
+              <button className="screenshot-btn" onClick={copyScreenshot}>
+                📋 复制图片
+              </button>
+              <button className="screenshot-btn" onClick={saveScreenshot}>
+                💾 保存本地
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {toast && <div className="share-toast">{toast}</div>}
     </>

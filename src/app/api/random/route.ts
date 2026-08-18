@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
   const mode = resolveMode(sp.get("mode"));
   const seed =
     sp.get("seed") ??
-    new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+    Date.now().toString(36); // 每次随机
 
   try {
     const poem = await getPoemBySeed(mode, seed);

@@ -6,12 +6,9 @@ import type { Poem } from "@/types";
 import { poemLines } from "@/lib/format";
 import { poemHref, type Mode } from "@/lib/mode";
 
-/** 今日日期（客户端时区），作为每日定首的 seed */
-function todaySeed(): string {
-  const d = new Date();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${d.getFullYear()}-${m}-${day}`;
+/** 每次刷新都不同的 seed：基于当前时间戳 */
+function freshSeed(): string {
+  return Date.now().toString(36);
 }
 
 /** 首页「每日一首」：全诗库随机一首，可重摇换诗 */
@@ -34,7 +31,7 @@ export default function DailyPoem({ mode }: { mode: Mode }) {
 
   // 首次加载：每日一首（按日期稳定）
   useEffect(() => {
-    load(todaySeed());
+    load(freshSeed());
   }, [load]);
 
   const shuffle = () => {
@@ -49,7 +46,7 @@ export default function DailyPoem({ mode }: { mode: Mode }) {
   return (
     <section className="daily-poem">
       <div className="daily-head">
-        <h2 className="section-title">每日一首</h2>
+        <h2 className="section-title">随机一首</h2>
         <button className="daily-shuffle" onClick={shuffle} title="随机换一首">
           🎲 重摇
         </button>

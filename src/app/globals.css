@@ -697,6 +697,77 @@ mark {
   font-weight: 600;
 }
 
+/* ===== 截图预览弹窗 ===== */
+.screenshot-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 20px;
+}
+.screenshot-modal {
+  background: #faf7f0;
+  border-radius: 12px;
+  max-width: 420px;
+  width: 100%;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+}
+.screenshot-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--ink);
+  border-bottom: 1px solid var(--line);
+}
+.screenshot-close {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: var(--ink-light);
+  padding: 0 4px;
+}
+.screenshot-close:hover {
+  color: var(--ink);
+}
+.screenshot-preview {
+  padding: 16px;
+  display: flex;
+  justify-content: center;
+}
+.screenshot-preview img {
+  max-width: 100%;
+  max-height: 50vh;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+.screenshot-actions {
+  display: flex;
+  gap: 12px;
+  padding: 0 18px 18px;
+}
+.screenshot-btn {
+  flex: 1;
+  padding: 10px 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--ink);
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.screenshot-btn:hover {
+  background: var(--accent-bg);
+}
+
 /* ===== toast 提示 ===== */
 .share-toast {
   position: fixed;
