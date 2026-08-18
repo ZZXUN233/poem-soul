@@ -1,0 +1,26 @@
+{
+  "name": "peom-soul",
+  "version": "0.1.0",
+  "private": true,
+  "description": "诗魂 · Poem Soul —— 基于离线语料的古诗词索引 / 展示 / 阅读 Web 应用",
+  "scripts": {
+    "build:data": "node scripts/build-data.mjs",
+    "test": "tsx --test scripts/search.core.test.mts",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "next": "16.3.1",
+    "react": "19.2.8",
+    "react-dom": "19.2.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "tsx": "^4.23.12",
+    "typescript": "^5.0.0"
+  }
+}
