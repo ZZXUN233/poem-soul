@@ -183,8 +183,39 @@ export function normalizeKeyword(raw: string): string {
   return (raw ?? "").trim().replace(/\s+/g, "");
 }
 
+/** 字符串确定性哈希（0 ~ 2^32-1），用于按 seed 随机排序 */
+function hashString(s: string): number {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+  return h;
+}
+
+/** mulberry32：确定性伪随机数生成器 */
+function mulberry32(seed: number): () => number {
+  let a = seed >>> 0;
+  return function () {
+    a |= 0;
+    a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/** 按 seed 确定性洗牌（Fisher-Yates），同一 seed 得到相同顺序便于稳定分页 */
+function seededShuffle<T>(arr: T[], seed: string): T[] {
+  const rng = mulberry32(hashString(seed));
+  const out = arr.slice();
+  for (let i = out.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [out[i], out[j]] = [out[j], out[i]];
+  }
+  return out;
+}
+
 /**
- * 浏览/书架：在给定诗词数组上做 朝代/体裁/集 过滤 + 分页（无需关键字）。
+ * 浏览/书架：在给定诗词数组上做 朝代/体裁/集 过滤 + 排序 + 分页（无需关键字）。
+ * sort:"random" 时按 seed 确定性洗牌（缺省 seed 用固定串），同一 seed 分页稳定。
  * 返回 { items, total, page, totalPages }。纯函数，便于测试。
  */
 export function browsePoems(
@@ -193,16 +224,23 @@ export function browsePoems(
     dynasty?: string;
     form?: string;
     collection?: string;
+    sort?: "random";
+    seed?: string;
     page?: number;
     pageSize?: number;
   } = {}
 ) {
-  const filtered = poems.filter((p) => {
+  let filtered = poems.filter((p) => {
     if (opts.collection && !p.id.startsWith(`${opts.collection}-`)) return false;
     if (opts.dynasty && p.dynasty !== opts.dynasty) return false;
     if (opts.form && p.form !== opts.form) return false;
     return true;
   });
+
+  // 随机排序：确定性洗牌，保持分页稳定
+  if (opts.sort === "random") {
+    filtered = seededShuffle(filtered, opts.seed ?? "poem-soul-browse");
+  }
 
   const page = opts.page && opts.page >= 1 ? Math.floor(opts.page) : 1;
   const pageSize =

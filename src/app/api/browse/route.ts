@@ -6,14 +6,16 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 /**
- * GET /api/browse?collection=&dynasty=&form=&page=&pageSize=
- * 书架/浏览：无关键字，按 集/朝代/体裁 过滤 + 分页。
+ * GET /api/browse?collection=&dynasty=&form=&sort=random&seed=&page=&pageSize=
+ * 书架/浏览：无关键字，按 集/朝代/体裁 过滤 + 排序 + 分页。
  */
 export async function GET(request: NextRequest) {
   const sp = request.nextUrl.searchParams;
   const collection = sp.get("collection") || undefined;
   const dynasty = sp.get("dynasty") || undefined;
   const form = sp.get("form") || undefined;
+  const sort = sp.get("sort") === "random" ? "random" : undefined;
+  const seed = sp.get("seed") || undefined;
   const page = Number(sp.get("page") ?? 1);
   const pageSize = Number(sp.get("pageSize") ?? 20);
 
@@ -23,6 +25,8 @@ export async function GET(request: NextRequest) {
       collection,
       dynasty,
       form,
+      sort,
+      seed,
       page,
       pageSize,
     });

@@ -100,6 +100,33 @@ test("browsePoems 过滤 + 分页边界", () => {
   assert.equal(coll.total, 1);
 });
 
+test("browsePoems 随机排序：同 seed 稳定，不同 seed 打乱", () => {
+  // 构造一批可排序的诗词
+  const codes = Array.from({ length: 50 }, (_, i) => String.fromCharCode(0x4e00 + i));
+  const big = codes.map((title, i) => ({
+    id: `x-${String(i).padStart(6, "0")}`,
+    title,
+    author: "",
+    dynasty: "唐",
+    form: "五言绝句",
+    content: "",
+  }));
+
+  // 同一 seed 两页作者/顺序一致（稳定分页）
+  const a1 = browsePoems(big, { sort: "random", seed: "s-1", page: 1, pageSize: 10 }).items.map((p) => p.id);
+  const a2 = browsePoems(big, { sort: "random", seed: "s-1", page: 1, pageSize: 10 }).items.map((p) => p.id);
+  assert.deepEqual(a1, a2, "同 seed 应得到相同顺序");
+
+  // 不同 seed 顺序应不同
+  const b = browsePoems(big, { sort: "random", seed: "s-2", page: 1, pageSize: 10 }).items.map((p) => p.id);
+  const same = a1.length === b.length && a1.every((v, i) => v === b[i]);
+  assert.equal(same, false, "不同 seed 顺序应不同");
+
+  // 未指定 seed 时也应有内容且总数不变
+  const total = browsePoems(big, { sort: "random" }).total;
+  assert.equal(total, big.length);
+});
+
 test("buildSearchResponse 剥离内部 score 并分页", () => {
   const hits = searchPoems(corpus, "唐"); // 无关键字命中？"唐"不在任何字段，应返回 0
   // 用附带 score 的构造检验
