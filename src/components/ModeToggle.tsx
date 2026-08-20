@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { DEFAULT_MODE, isMode, storeMode, type Mode } from "@/lib/mode";
+import { DEFAULT_MODE, isMode, type Mode } from "@/lib/mode";
 
 const OPTIONS: { value: Mode; label: string }[] = [
   { value: "classic", label: "古诗词" },
@@ -17,32 +17,34 @@ function switchTarget(pathname: string, m: Mode): string {
   return pathname;
 }
 
-/** 导航栏模式开关：古诗词 / 现代诗 一键切换（URL ?mode= 驱动 + localStorage 记住默认） */
+/** 导航栏模式开关：古诗词 / 现代诗 一键切换（由 URL ?mode= 驱动，缺省为古诗词） */
 export default function ModeToggle() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
   const paramMode = searchParams.get("mode");
-  // 首次渲染与服务端一致（DEFAULT_MODE），客户端挂载后再从 localStorage 同步
+  // 模式完全由 URL 决定：无 ?mode= 时默认古诗词，不做 localStorage 覆盖
+  // （保证与服务端渲染的正文模式一致，避免"标题显示现代诗、内容是古诗词"的错位）
   const [current, setCurrent] = useState<Mode>(
     isMode(paramMode) ? paramMode : DEFAULT_MODE
   );
 
-  useEffect(() => {
-    if (!isMode(paramMode)) {
-      const stored = window.localStorage.getItem("peomsoul-mode");
-      if (isMode(stored)) setCurrent(stored);
-    }
-  }, [paramMode]);
-
   const switchTo = (m: Mode) => {
     if (m === current) return;
-    storeMode(m);
     setCurrent(m);
-    const base = switchTarget(pathname, m);
-    const query = new URLSearchParams(searchParams.toString());
-    query.set("mode", m);
+    let query: URLSearchParams;
+    let base: string;
+    if (pathname === "/search") {
+      // 搜索页切换模式：清空搜索条件（q/朝代/体裁/命中/页码），仅保留 mode
+      query = new URLSearchParams();
+      query.set("mode", m);
+      base = pathname;
+    } else {
+      base = switchTarget(pathname, m);
+      query = new URLSearchParams(searchParams.toString());
+      query.set("mode", m);
+    }
     router.push(`${base}?${query.toString()}`);
   };
 

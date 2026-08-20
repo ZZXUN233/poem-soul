@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import ModeToggle from "@/components/ModeToggle";
+import SearchNavLink from "@/components/SearchNavLink";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -28,7 +29,9 @@ export default function RootLayout({
               <Suspense>
                 <ModeToggle />
               </Suspense>
-              <Link href="/search">搜索</Link>
+              <Suspense>
+                <SearchNavLink />
+              </Suspense>
             </nav>
           </div>
         </header>

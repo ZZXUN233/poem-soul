@@ -55,11 +55,15 @@ export default function SearchPage({
     }) => {
       const sp = new URLSearchParams();
       sp.set("mode", mode);
-      const nextQ = updates.q ?? q;
-      const nextDynasty = updates.dynasty ?? dynasty;
-      const nextForm = updates.form ?? form;
-      const nextMatch = updates.match ?? match;
-      const nextPage = updates.page ?? page;
+      // 区分「未传」（保留当前值）与「显式传 undefined」（清空该条件）：
+      // 否则点「全部」清空朝代/体裁时会因 ?? 回退到当前值而失效。
+      const has = (k: string) =>
+        Object.prototype.hasOwnProperty.call(updates, k);
+      const nextQ = has("q") ? updates.q : q;
+      const nextDynasty = has("dynasty") ? updates.dynasty : dynasty;
+      const nextForm = has("form") ? updates.form : form;
+      const nextMatch = has("match") ? updates.match : match;
+      const nextPage = has("page") ? updates.page : page;
       if (nextQ) sp.set("q", nextQ);
       if (nextDynasty) sp.set("dynasty", nextDynasty);
       if (nextForm) sp.set("form", nextForm);
