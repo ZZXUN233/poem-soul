@@ -1,8 +1,9 @@
 {
   "version": 1,
-  "generatedAt": "2026-08-18T11:38:17.234Z",
-  "totalPoems": 76253,
-  "totalChars": 5404591,
+  "generatedAt": "2026-08-20 11:34:22",
+  "source": "chinese-poetry (upstream, sync-classic-upstream.mjs)",
+  "totalPoems": 90911,
+  "totalChars": 6515063,
   "allDynasties": [
     "五代",
     "元",
@@ -27,52 +28,40 @@
   ],
   "collections": [
     {
-      "key": "caocao",
-      "label": "曹操集",
-      "count": 26,
+      "key": "tang",
+      "label": "全唐诗",
+      "count": 57607,
       "dynasties": [
-        "汉"
-      ],
-      "forms": [
-        "乐府诗"
-      ]
-    },
-    {
-      "key": "chuci",
-      "label": "楚辞",
-      "count": 65,
-      "dynasties": [
-        "先秦"
-      ],
-      "forms": [
-        "楚辞"
-      ]
-    },
-    {
-      "key": "poems",
-      "label": "精选种子",
-      "count": 10,
-      "dynasties": [
-        "唐",
-        "宋"
+        "唐"
       ],
       "forms": [
         "七言律诗",
         "七言绝句",
         "五言律诗",
         "五言绝句",
+        "古体诗"
+      ]
+    },
+    {
+      "key": "song_ci",
+      "label": "宋词",
+      "count": 21050,
+      "dynasties": [
+        "宋"
+      ],
+      "forms": [
         "词"
       ]
     },
     {
-      "key": "qing",
-      "label": "清词（纳兰性德）",
-      "count": 257,
+      "key": "yuanqu",
+      "label": "元曲",
+      "count": 11057,
       "dynasties": [
-        "清"
+        "元"
       ],
       "forms": [
-        "词"
+        "曲"
       ]
     },
     {
@@ -87,29 +76,36 @@
       ]
     },
     {
-      "key": "song_ci",
-      "label": "宋词",
-      "count": 21042,
+      "key": "chuci",
+      "label": "楚辞",
+      "count": 65,
       "dynasties": [
-        "宋"
+        "先秦"
       ],
       "forms": [
-        "词"
+        "楚辞"
       ]
     },
     {
-      "key": "tang",
-      "label": "全唐诗",
-      "count": 43099,
+      "key": "caocao",
+      "label": "曹操集",
+      "count": 26,
       "dynasties": [
-        "唐"
+        "汉"
       ],
       "forms": [
-        "七言律诗",
-        "七言绝句",
-        "五言律诗",
-        "五言绝句",
-        "古体诗"
+        "乐府诗"
+      ]
+    },
+    {
+      "key": "qing",
+      "label": "清词（纳兰性德）",
+      "count": 258,
+      "dynasties": [
+        "清"
+      ],
+      "forms": [
+        "词"
       ]
     },
     {
@@ -121,17 +117,6 @@
       ],
       "forms": [
         "词"
-      ]
-    },
-    {
-      "key": "yuanqu",
-      "label": "元曲",
-      "count": 10906,
-      "dynasties": [
-        "元"
-      ],
-      "forms": [
-        "曲"
       ]
     }
   ]

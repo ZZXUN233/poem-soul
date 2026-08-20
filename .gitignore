@@ -22,5 +22,8 @@ yarn-error.log*
 # 现代诗源数据缓存（下载/解压临时物，不入库）
 /scripts/.cache/
 
+# 数据审计/诊断产物（临时，不入库）
+/scripts/.audit/
+
 # playwright-mcp 自动化验证产物（console 日志 / 页面快照，不入库）
 /.playwright-mcp/
