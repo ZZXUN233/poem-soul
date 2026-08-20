@@ -28,6 +28,7 @@ export default function PoemReader({
         {poem.year ? <span>{poem.year}</span> : null}
         <span>{poem.form || "体裁未知"}</span>
       </div>
+      <hr className="reader-rule" aria-hidden="true" />
 
       {couplets ? (
         <div className="reader-jushi">

@@ -9,5 +9,10 @@ export default function SearchNavLink() {
   const searchParams = useSearchParams();
   const paramMode = searchParams.get("mode");
   const mode = isMode(paramMode) ? paramMode : DEFAULT_MODE;
-  return <Link href={modeHref("/search", mode)}>搜索</Link>;
+  return (
+    <Link href={modeHref("/search", mode)} className="nav-search">
+      <span aria-hidden="true">🔍</span>
+      检索
+    </Link>
+  );
 }

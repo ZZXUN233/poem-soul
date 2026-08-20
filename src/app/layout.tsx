@@ -35,7 +35,7 @@ export default function RootLayout({
             </nav>
           </div>
         </header>
-        <main className="container site-main">{children}</main>
+        <main className="site-main">{children}</main>
         <footer className="site-footer">
           <div className="container">
             古诗词语料来自{" "}

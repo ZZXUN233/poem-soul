@@ -25,16 +25,19 @@ export default async function ReaderPage({
   if (!poem) {
     notFound();
   }
+  const skin = mode === "modern" ? "page-modern" : "page-classic";
 
   // 相关推荐：同类/同作者/同名（全库线性扫，search index 已缓存）
   const index = await getSearchIndex(mode);
   const related = getRelatedPoems(poem, index);
 
   return (
-    <>
-      <PoemReader poem={poem} mode={mode} />
-      <ShareActions poem={poem} />
-      <RelatedSection poem={poem} initialRelated={related} mode={mode} />
-    </>
+    <div className={`page ${skin}`}>
+      <div className="container">
+        <PoemReader poem={poem} mode={mode} />
+        <ShareActions poem={poem} />
+        <RelatedSection poem={poem} initialRelated={related} mode={mode} />
+      </div>
+    </div>
   );
 }

@@ -1,18 +1,12 @@
-/* 诗魂 · Poem Soul —— 全局样式 */
-:root {
-  --paper: #faf7f0;
-  --paper-2: #f1ece1;
-  --ink: #3a3226;
-  --ink-soft: #6b6050;
-  --ink-faint: #9a8f7c;
-  --accent: #8a3b2e;
-  --accent-soft: #a85a45;
-  --line: #e2d9c8;
-  --mark-bg: #ffd98a;
-  --serif: "Noto Serif SC", "Songti SC", "SimSun", Georgia, serif;
-  --sans: "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
-}
+/* Hallmark · macrostructure: Manifesto-hero (home) / document-led (app) / long-document (reader)
+ * tone: editorial · anchor hue: vermillion 朱砂 30° · stamp: macrostructure / theme
+ * custom theme 「墨宣 Ink & rice-paper」· classic + modern mode-skins
+ */
+@import "./tokens.css";
 
+/* ============================================================
+   Base
+   ============================================================ */
 * {
   box-sizing: border-box;
 }
@@ -21,10 +15,16 @@ html,
 body {
   margin: 0;
   padding: 0;
-  background: var(--paper);
-  color: var(--ink);
-  font-family: var(--serif);
-  line-height: 1.7;
+  overflow-x: clip; /* no horizontal scroll; never `hidden` */
+}
+
+body {
+  background: var(--color-paper); /* classic band behind the header/footer binding */
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  line-height: 1.75;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 a {
@@ -32,613 +32,655 @@ a {
   text-decoration: none;
 }
 
-.container {
-  max-width: 880px;
-  margin: 0 auto;
-  padding: 0 20px;
+button {
+  font-family: var(--font-ui);
+  letter-spacing: 0.02em;
 }
 
-/* ===== 页头 ===== */
+.container {
+  width: 100%;
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 0 var(--space-lg);
+}
+
+@media (max-width: 480px) {
+  .container { padding: 0 var(--space-md); }
+}
+
+/* ==== page skin shell (full-bleed paper, mode-temperature aware) ==== */
+.page {
+  width: 100%;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  min-height: 60vh;
+  padding-top: var(--space-xl);
+  padding-bottom: var(--space-3xl);
+}
+.page-classic { background: var(--color-paper); }
+.page-modern  { background: var(--color-paper); }
+
+/* ============================================================
+   Header — the "binding" (constant warm band, both modes)
+   ============================================================ */
 .site-header {
-  background: var(--paper-2);
-  border-bottom: 1px solid var(--line);
+  background: var(--color-paper-2);
+  border-bottom: var(--rule-hair) solid var(--color-rule);
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: 20;
 }
 
 .header-inner {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-top: 12px;
-  padding-bottom: 12px;
+  gap: var(--space-md);
+  padding-top: var(--space-sm);
+  padding-bottom: var(--space-sm);
 }
 
 .brand {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-sm);
+  font-family: var(--font-display);
   font-weight: 600;
-  font-size: 20px;
+  font-size: var(--text-lg);
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  min-width: 0;
 }
 
+/* 詩 字标：朱砂方形印章 */
 .brand-mark {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
-  background: var(--accent);
-  color: var(--paper);
-  border-radius: 6px;
-  font-size: 20px;
+  width: 38px;
+  height: 38px;
+  background: var(--color-accent);
+  color: var(--color-accent-paper);
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  border-radius: var(--radius-xs);
+  flex: 0 0 auto;
+  box-shadow: 0 1px 0 oklch(20% 0.06 28 / 0.14);
+}
+
+.brand-name {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.35em;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 .brand-sub {
-  font-size: 13px;
-  color: var(--ink-faint);
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  color: var(--color-ink-3);
   font-weight: 400;
-  margin-left: 4px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
 
 .header-nav {
   display: flex;
-  gap: 22px;
-  font-size: 16px;
+  align-items: center;
+  gap: var(--space-md);
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
 }
 
-.header-nav a {
-  color: var(--ink-soft);
-  transition: color 0.15s;
+/* 搜索入口 —— 名词态 CTA */
+.nav-search {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  color: var(--color-ink-2);
+  padding: var(--space-2xs) var(--space-sm);
+  border-radius: var(--radius-pill);
+  border: var(--rule-hair) solid var(--color-rule);
+  background: var(--color-paper);
+  white-space: nowrap;
+  transition: color var(--dur-short) var(--ease-out),
+              border-color var(--dur-short) var(--ease-out);
+}
+.nav-search:hover { color: var(--color-accent); border-color: var(--color-accent-soft); }
+.nav-search:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.nav-search .kbd {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-ink-3);
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-xs);
+  padding: 0 0.35em;
+  line-height: 1.5;
 }
 
-.header-nav a:hover {
-  color: var(--accent);
-}
-
-/* ===== 语料模式开关 ===== */
+/* ===== 语料模式开关 —— 居中的核心导航隐喻 ===== */
 .mode-toggle {
   display: inline-flex;
-  gap: 0;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  overflow: hidden;
+  gap: 2px;
+  padding: 3px;
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-pill);
+  background: var(--color-paper);
 }
 
 .mode-pill {
   background: transparent;
   border: none;
-  color: var(--ink-soft);
-  font-family: var(--serif);
-  font-size: 14px;
+  color: var(--color-ink-2);
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
   line-height: 1;
-  padding: 6px 13px;
+  padding: var(--space-2xs) var(--space-sm);
+  border-radius: calc(var(--radius-pill) - 3px);
   cursor: pointer;
-  transition: all 0.15s;
+  transition: background var(--dur-short) var(--ease-out),
+              color var(--dur-short) var(--ease-out);
+  white-space: nowrap;
 }
-
-.mode-pill + .mode-pill {
-  border-left: 1px solid var(--line);
-}
-
-.mode-pill:hover {
-  color: var(--accent);
-}
-
+.mode-pill:hover { color: var(--color-accent); }
+.mode-pill:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
 .mode-pill.active {
-  background: var(--accent);
-  color: var(--paper);
+  background: var(--color-accent);
+  color: var(--color-accent-paper);
+  box-shadow: 0 1px 0 oklch(20% 0.06 28 / 0.14);
 }
 
-/* ===== 主体 ===== */
-.site-main {
-  padding-top: 28px;
-  padding-bottom: 60px;
-  min-height: 70vh;
-}
-
+/* ============================================================
+   Footer — statement band
+   ============================================================ */
 .site-footer {
-  border-top: 1px solid var(--line);
-  color: var(--ink-faint);
-  font-size: 13px;
-  padding: 20px 0;
-  text-align: center;
+  border-top: var(--rule-hair) solid var(--color-rule);
+  color: var(--color-ink-3);
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  padding: var(--space-lg) 0;
+  letter-spacing: 0.01em;
+  background: var(--color-paper-2);
 }
+.site-footer .container { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.4em 1em; }
+.site-footer a { color: var(--color-accent-soft); }
+.site-footer a:hover { color: var(--color-accent); }
 
-.site-footer a {
-  color: var(--accent-soft);
-}
-
-/* ===== 首页横幅 ===== */
+/* ============================================================
+   Hero —— classic manifesto / modern quieter
+   ============================================================ */
 .hero {
   text-align: center;
-  padding: 24px 0 28px;
+  padding: var(--space-lg) 0 var(--space-xl);
+  position: relative;
+}
+
+.hero .eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  letter-spacing: 0.22em;
+  color: var(--color-ink-3);
+  margin-bottom: var(--space-sm);
+  white-space: nowrap;
 }
 
 .hero h1 {
-  font-size: 30px;
-  margin: 0 0 8px;
-  letter-spacing: 2px;
+  font-family: var(--font-display);
+  font-size: var(--text-display);
+  font-weight: 600;
+  font-style: normal; /* italic headers banned */
+  letter-spacing: 0.08em;
+  line-height: 1.15;
+  margin: 0 0 var(--space-md);
+  overflow-wrap: anywhere;
+  min-width: 0;
 }
 
-.hero p {
-  color: var(--ink-soft);
-  margin: 0;
+.hero .brand-seal {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  margin: 0 auto var(--space-md);
+  background: var(--color-accent);
+  color: var(--color-accent-paper);
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-weight: 700;
+  border-radius: var(--radius-xs);
+  box-shadow: 0 1px 0 oklch(20% 0.06 28 / 0.16);
+}
+
+.hero .lede {
+  color: var(--color-ink-2);
+  font-size: var(--text-lg);
+  max-width: 30em;
+  margin: 0 auto;
 }
 
 .hero-stats {
-  display: flex;
+  display: inline-flex;
   justify-content: center;
-  gap: 32px;
-  margin-top: 16px;
-  font-size: 15px;
-  color: var(--ink-soft);
+  align-items: stretch;
+  gap: 0;
+  margin-top: var(--space-lg);
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--color-paper-2);
+}
+.hero-stat {
+  padding: var(--space-sm) var(--space-lg) var(--space-sm) var(--space-lg);
+  text-align: center;
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  color: var(--color-ink-2);
+  letter-spacing: 0.08em;
+}
+.hero-stat + .hero-stat { border-left: var(--rule-hair) solid var(--color-rule); }
+.hero-stat b {
+  display: block;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: var(--text-xl);
+  color: var(--color-accent);
+  letter-spacing: 0;
+  margin-bottom: 2px;
 }
 
-.hero-stats b {
-  color: var(--accent);
-  font-size: 18px;
+/* modern hero —— quieter, left-bias, smaller */
+.page-modern .hero { text-align: left; padding: var(--space-md) 0 var(--space-xl); }
+.page-modern .hero .brand-seal { margin: 0 0 var(--space-md); }
+.page-modern .hero h1 { font-size: var(--text-display-s); letter-spacing: 0.02em; }
+.page-modern .hero .lede { margin-left: 0; }
+.page-modern .hero-stats { justify-content: flex-start; }
+
+/* ============================================================
+   Section heads
+   ============================================================ */
+.section-title {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: 600;
+  font-style: normal;
+  margin: 0 0 var(--space-2xs);
+  color: var(--color-ink);
+}
+.section-tag {
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  letter-spacing: 0.22em;
+  color: var(--color-accent);
+  text-transform: uppercase;
+  margin: 0 0 var(--space-2xs);
 }
 
-/* ===== 采集卡 ===== */
+/* ============================================================
+   浏览 / 书架集合卡
+   ============================================================ */
 .collection-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 14px;
-  margin: 20px 0;
+  gap: var(--space-sm);
+  margin: var(--space-lg) 0;
 }
-
 .collection-card {
-  background: var(--paper-2);
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  padding: 16px;
-  transition: transform 0.15s, box-shadow 0.15s;
+  background: var(--color-paper-2);
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  transition: transform var(--dur-short) var(--ease-out),
+              border-color var(--dur-short) var(--ease-out);
 }
-
-.collection-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 14px rgba(58, 50, 38, 0.08);
-}
-
+.collection-card:hover { transform: translateY(-2px); border-color: var(--color-rule-strong); }
 .collection-card .cc-name {
-  font-size: 18px;
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
   font-weight: 600;
-  margin-bottom: 4px;
+  margin-bottom: var(--space-2xs);
 }
-
 .collection-card .cc-count {
-  color: var(--ink-faint);
-  font-size: 14px;
+  color: var(--color-ink-3);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
 }
 
-/* ===== 筛选条 ===== */
+/* ============================================================
+   筛选条 / 命中 tab —— pill 系统
+   ============================================================ */
 .filter-bar {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: var(--space-2xs);
   align-items: center;
-  margin: 12px 0 18px;
+  margin: var(--space-md) 0 var(--space-lg);
 }
-
 .filter-label {
-  color: var(--ink-faint);
-  font-size: 14px;
+  color: var(--color-ink-3);
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  margin-right: var(--space-2xs);
+  white-space: nowrap;
 }
-
 .filter-chip {
-  background: var(--paper-2);
-  border: 1px solid var(--line);
-  color: var(--ink-soft);
-  border-radius: 999px;
+  background: var(--color-paper-2);
+  border: var(--rule-hair) solid var(--color-rule);
+  color: var(--color-ink-2);
+  border-radius: var(--radius-pill);
   padding: 4px 14px;
-  font-size: 14px;
+  font-size: var(--text-sm);
   cursor: pointer;
-  transition: all 0.15s;
-  font-family: var(--serif);
+  transition: border-color var(--dur-short) var(--ease-out),
+              color var(--dur-short) var(--ease-out);
+  white-space: nowrap;
 }
-
-.filter-chip:hover {
-  border-color: var(--accent-soft);
-  color: var(--accent);
-}
-
+.filter-chip:hover { border-color: var(--color-accent-soft); color: var(--color-accent); }
+.filter-chip:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
 .filter-chip.active {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--paper);
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-accent-paper);
 }
 
-/* ===== 命中 tab ===== */
-.match-tabs {
-  display: flex;
-  gap: 8px;
-  margin: 4px 0 16px;
-}
-
+.match-tabs { display: flex; flex-wrap: wrap; gap: var(--space-2xs); margin: 4px 0 var(--space-md); }
 .match-tab {
   background: transparent;
-  border: 1px solid var(--line);
-  color: var(--ink-soft);
-  border-radius: 8px;
+  border: var(--rule-hair) solid var(--color-rule);
+  color: var(--color-ink-2);
+  border-radius: var(--radius-pill);
   padding: 5px 16px;
-  font-size: 14px;
-  font-family: var(--serif);
+  font-size: var(--text-sm);
   cursor: pointer;
-  transition: all 0.15s;
+  transition: border-color var(--dur-short) var(--ease-out),
+              color var(--dur-short) var(--ease-out);
+  white-space: nowrap;
 }
+.match-tab:hover { border-color: var(--color-accent-soft); color: var(--color-accent); }
+.match-tab:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.match-tab.active { background: var(--color-accent); border-color: var(--color-accent); color: var(--color-accent-paper); }
 
-.match-tab:hover {
-  border-color: var(--accent-soft);
-  color: var(--accent);
-}
-
-.match-tab.active {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--paper);
-}
-
-/* ===== 搜索 ===== */
-.search-bar {
-  display: flex;
-  gap: 10px;
-  margin: 16px 0;
-}
-
+/* ============================================================
+   搜索
+   ============================================================ */
+.search-bar { display: flex; gap: var(--space-sm); margin: var(--space-md) 0; }
 .search-input {
   flex: 1;
+  min-width: 0;
   padding: 12px 16px;
-  font-size: 16px;
-  font-family: var(--serif);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--paper-2);
-  color: var(--ink);
+  font-size: var(--text-md);
+  font-family: var(--font-body);
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-sm);
+  background: var(--color-paper-2);
+  color: var(--color-ink);
   outline: none;
-  transition: border-color 0.15s;
+  transition: border-color var(--dur-short) var(--ease-out),
+              box-shadow var(--dur-short) var(--ease-out);
 }
-
-.search-input:focus {
-  border-color: var(--accent-soft);
-}
+.search-input::placeholder { color: var(--color-ink-3); }
+.search-input:hover { border-color: var(--color-rule-strong); }
+.search-input:focus { border-color: var(--color-accent-soft); box-shadow: 0 0 0 3px var(--color-accent-wash); }
+.search-input:focus-visible { outline: none; } /* border + wash carries focus; no flicker */
 
 .search-btn {
-  padding: 12px 22px;
-  font-size: 16px;
-  font-family: var(--serif);
-  background: var(--accent);
-  color: var(--paper);
+  padding: 12px 24px;
+  font-size: var(--text-md);
+  font-family: var(--font-ui);
+  background: var(--color-accent);
+  color: var(--color-accent-paper);
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
+  transition: background var(--dur-short) var(--ease-out),
+              transform var(--dur-short) var(--ease-out);
+  white-space: nowrap;
 }
-
-.search-btn:hover {
-  background: var(--accent-soft);
-}
+.search-btn:hover { background: var(--color-accent-deep); }
+.search-btn:active { transform: translateY(1px); }
+.search-btn:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.search-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
 .search-meta {
-  color: var(--ink-soft);
-  margin: 8px 0 12px;
-  font-size: 15px;
+  color: var(--color-ink-2);
+  margin: var(--space-2xs) 0 var(--space-sm);
+  font-size: var(--text-sm);
 }
+.search-meta b { color: var(--color-accent); font-weight: 600; }
 
-/* ===== 诗词卡 ===== */
-.poem-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
+/* ============================================================
+   诗词卡
+   ============================================================ */
+.poem-list { display: flex; flex-direction: column; gap: var(--space-sm); }
 .poem-card {
-  background: var(--paper-2);
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  padding: 16px 18px;
-  transition: box-shadow 0.15s;
+  background: var(--color-paper-2);
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-md);
+  padding: var(--space-md) var(--space-lg);
+  transition: border-color var(--dur-short) var(--ease-out);
 }
-
-.poem-card:hover {
-  box-shadow: 0 4px 14px rgba(58, 50, 38, 0.08);
-}
-
-.poem-card-head {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-  margin-bottom: 6px;
-}
-
-.poem-card-title {
-  font-size: 18px;
-  font-weight: 600;
-}
-
-.poem-card-author {
-  color: var(--ink-soft);
-}
-
-.poem-card-meta {
-  font-size: 13px;
-  color: var(--ink-faint);
-  margin-bottom: 8px;
-}
-
-.poem-card-content {
-  color: var(--ink-soft);
-  font-size: 15px;
-  white-space: pre-line;
-}
+.poem-card:hover { border-color: var(--color-rule-strong); }
+.poem-card-head { display: flex; align-items: baseline; gap: var(--space-sm); margin-bottom: var(--space-2xs); flex-wrap: wrap; }
+.poem-card-title { font-family: var(--font-display); font-size: var(--text-lg); font-weight: 600; }
+.poem-card-author { color: var(--color-ink-2); font-size: var(--text-sm); }
+.poem-card-meta { font-family: var(--font-ui); font-size: var(--text-xs); color: var(--color-ink-3); margin-bottom: var(--space-xs); letter-spacing: 0.06em; }
+.poem-card-content { color: var(--color-ink-2); font-size: var(--text-sm); white-space: pre-line; }
 
 mark {
-  background: var(--mark-bg);
-  color: var(--ink);
+  background: var(--color-mark-bg);
+  color: var(--color-ink);
   padding: 0 1px;
   border-radius: 2px;
 }
-
 .match-kind {
-  font-size: 12px;
-  color: var(--accent-soft);
-  border: 1px solid var(--accent-soft);
-  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  color: var(--color-accent-soft);
+  border: var(--rule-hair) solid var(--color-accent-soft);
+  border-radius: var(--radius-xs);
   padding: 0 6px;
   margin-left: 6px;
+  white-space: nowrap;
 }
 
-/* ===== 分页 ===== */
+/* ============================================================
+   分页
+   ============================================================ */
 .pagination {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 14px;
-  margin-top: 24px;
+  gap: var(--space-sm);
+  margin-top: var(--space-lg);
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  flex-wrap: wrap;
 }
-
 .pagination button,
 .pagination a,
 .pagination span.page-link {
   padding: 6px 14px;
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  background: var(--paper-2);
-  color: var(--ink-soft);
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-xs);
+  background: var(--color-paper-2);
+  color: var(--color-ink-2);
   cursor: pointer;
-  font-family: var(--serif);
-  font-size: 14px;
-  text-decoration: none;
+  font-size: var(--text-sm);
+  white-space: nowrap;
+  transition: border-color var(--dur-short) var(--ease-out),
+              color var(--dur-short) var(--ease-out);
 }
-
 .pagination button:disabled,
-.pagination .disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
+.pagination .disabled { opacity: 0.4; cursor: not-allowed; }
 .pagination button:hover:not(:disabled),
-.pagination a:hover {
-  border-color: var(--accent-soft);
-  color: var(--accent);
-}
+.pagination a:hover { border-color: var(--color-accent-soft); color: var(--color-accent); }
+.pagination button:focus-visible,
+.pagination a:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.pagination .current { color: var(--color-accent); font-weight: 600; }
 
-.pagination .current {
-  color: var(--accent);
-  font-weight: 600;
-}
-
-/* ===== 阅读页 ===== */
+/* ============================================================
+   阅读页 —— the heart
+   ============================================================ */
 .reader {
-  max-width: 640px;
+  max-width: var(--measure-read);
   margin: 0 auto;
   text-align: center;
 }
-
+.reader-rule {
+  width: 3rem;
+  height: 3px;
+  background: var(--color-accent);
+  border: 0;
+  margin: var(--space-md) auto var(--space-lg);
+}
 .reader-title {
-  font-size: 28px;
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);
   font-weight: 600;
-  margin-bottom: 6px;
+  font-style: normal;
+  letter-spacing: 0.06em;
+  line-height: 1.3;
+  margin: 0 0 var(--space-xs);
+  overflow-wrap: anywhere;
+  min-width: 0;
 }
-
-.reader-meta {
-  color: var(--ink-soft);
-  font-size: 16px;
-  margin-bottom: 6px;
-}
-
-.reader-author {
-  color: var(--accent);
-  border-bottom: 1px dashed var(--accent-soft);
-  transition: border-color 0.15s;
-}
-
-.reader-author:hover {
-  border-bottom-style: solid;
-}
-
+.reader-meta { color: var(--color-ink-2); font-size: var(--text-md); margin-bottom: var(--space-2xs); }
+.reader-author { color: var(--color-accent); border-bottom: 1px dashed var(--color-accent-soft); transition: border-color var(--dur-short) var(--ease-out); }
+.reader-author:hover { border-bottom-style: solid; }
 .reader-badges {
-  color: var(--ink-faint);
-  font-size: 14px;
-  margin-bottom: 28px;
+  color: var(--color-ink-3);
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  letter-spacing: 0.08em;
+  margin-bottom: var(--space-lg);
   display: flex;
   justify-content: center;
-  gap: 14px;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
 }
 
 .reader-content {
-  font-size: 19px;
-  line-height: 2.2;
+  font-size: var(--text-lg);
+  line-height: 2.1;
   letter-spacing: 1px;
   white-space: pre-line;
-}
-
-/* 现代诗正文左对齐（标题/作者/徽标仍居中） */
-.reader-modern .reader-content {
   text-align: left;
-  max-width: 34em;
-  margin: 0 auto;
 }
 
-/* ===== 近体诗对仗对齐 ===== */
+/* 现代诗 —— 自由分行、左对齐、ragged-right，更大行距 */
+.reader-modern .reader-content,
+.page-modern .reader-content {
+  text-align: left;
+  max-width: var(--measure-read);
+  margin: 0 auto;
+  line-height: 2.3;
+  font-size: var(--text-lg);
+  letter-spacing: 0.02em;
+}
+.page-modern .reader-title { letter-spacing: 0.01em; font-size: var(--text-2xl); }
+.page-modern .reader-badges { justify-content: flex-start; }
+
+/* 近体诗对仗对齐 */
 .reader-jushi {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
-  font-size: 19px;
-  line-height: 1.8;
+  gap: var(--space-sm);
+  font-size: var(--text-lg);
+  line-height: 1.9;
 }
+.couplet { display: flex; align-items: baseline; gap: var(--space-md); letter-spacing: 1px; }
+.couplet .out { text-align: right; } /* 出句：右对齐到对句 */
+.couplet .in { text-align: left; }
 
-.couplet {
-  display: flex;
-  align-items: baseline;
-  gap: 18px;
-  letter-spacing: 1px;
-}
-
-.couplet .out {
-  /* 出句：右对齐到对句 */
-  text-align: right;
-}
-
-.couplet .in {
-  text-align: left;
-}
-
-/* ===== 每日一首 ===== */
-.daily-poem {
-  margin: 24px 0 8px;
-}
-
+/* ============================================================
+   每日一首
+   ============================================================ */
+.daily-poem { margin: var(--space-2xl) 0 var(--space-2xs); }
 .daily-head {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   justify-content: space-between;
-  margin-bottom: 8px;
+  gap: var(--space-md);
+  margin-bottom: var(--space-sm);
 }
-
-.daily-head .section-title {
-  margin: 0;
-}
-
+.daily-head .section-title { margin: 0; }
 .daily-shuffle {
-  background: var(--paper-2);
-  border: 1px solid var(--line);
-  color: var(--accent-soft);
-  border-radius: 999px;
+  background: var(--color-paper-2);
+  border: var(--rule-hair) solid var(--color-rule);
+  color: var(--color-accent-soft);
+  border-radius: var(--radius-pill);
   padding: 5px 16px;
-  font-size: 14px;
-  font-family: var(--serif);
+  font-size: var(--text-sm);
   cursor: pointer;
-  transition: all 0.15s;
+  white-space: nowrap;
+  transition: border-color var(--dur-short) var(--ease-out),
+              color var(--dur-short) var(--ease-out);
 }
-
-.daily-shuffle:hover {
-  border-color: var(--accent-soft);
-  background: var(--paper-2);
-}
+.daily-shuffle:hover { border-color: var(--color-accent-soft); color: var(--color-accent); }
+.daily-shuffle:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
 
 .daily-card {
-  background: var(--paper-2);
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 24px 20px;
+  background: var(--color-paper-2);
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-md);
+  padding: var(--space-xl) var(--space-xl);
   text-align: center;
 }
+.daily-card .reader-title { font-size: var(--text-2xl); }
+.daily-card .reader-meta { color: var(--color-ink-2); margin-bottom: var(--space-md); }
+.daily-read { margin-top: var(--space-md); font-size: var(--text-sm); }
+.daily-read a { color: var(--color-accent-soft); border-bottom: 1px dashed var(--color-accent-soft); }
+.daily-read a:hover { color: var(--color-accent); border-bottom-style: solid; }
 
-.daily-card .reader-title {
-  font-size: 24px;
-}
-
-.daily-card .reader-meta {
-  color: var(--ink-soft);
-  margin-bottom: 18px;
-}
-
-.daily-read {
-  margin-top: 18px;
-  font-size: 14px;
-}
-
-.daily-read a {
-  color: var(--accent-soft);
-}
-
-/* ===== 空状态 / 提示 ===== */
-.empty {
-  text-align: center;
-  color: var(--ink-faint);
-  padding: 48px 0;
-}
-
+/* ============================================================
+   空状态 / 提示
+   ============================================================ */
+.empty { text-align: center; color: var(--color-ink-3); padding: var(--space-2xl) 0; }
 .notice {
-  background: var(--paper-2);
-  border: 1px dashed var(--line);
-  border-radius: 10px;
-  padding: 20px;
-  color: var(--ink-soft);
-  font-size: 15px;
-}
-
-/* ===== 区块标题 ===== */
-.section-title {
-  font-size: 19px;
-  font-weight: 600;
-  margin: 22px 0 4px;
-  color: var(--ink);
+  background: var(--color-paper-2);
+  border: 1px dashed var(--color-rule-strong);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+  color: var(--color-ink-2);
+  font-size: var(--text-sm);
 }
 
 /* ===== 跨库搜索分组 ===== */
-.search-group {
-  margin-top: 8px;
-}
+.search-group { margin-top: var(--space-sm); }
+.search-group-count { margin-left: var(--space-sm); font-size: var(--text-sm); font-weight: 400; color: var(--color-ink-3); font-family: var(--font-mono); }
 
-.search-group-count {
-  margin-left: 10px;
-  font-size: 14px;
-  font-weight: 400;
-  color: var(--ink-faint);
-}
+/* ===== 作者页 ===== */
+.author-head { display: flex; align-items: baseline; gap: var(--space-md); flex-wrap: wrap; margin-bottom: var(--space-md); }
 
-/* ===== 分享操作栏 ===== */
-.share-actions {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin: 8px 0 8px;
-}
-
+/* ============================================================
+   分享操作栏
+   ============================================================ */
+.share-actions { display: flex; justify-content: center; gap: var(--space-sm); margin: var(--space-md) 0; flex-wrap: wrap; }
 .share-btn {
-  background: var(--paper-2);
-  border: 1px solid var(--line);
-  color: var(--ink-soft);
-  border-radius: 999px;
+  background: var(--color-paper-2);
+  border: var(--rule-hair) solid var(--color-rule);
+  color: var(--color-ink-2);
+  border-radius: var(--radius-pill);
   padding: 6px 18px;
-  font-size: 14px;
-  font-family: var(--serif);
+  font-size: var(--text-sm);
   cursor: pointer;
-  transition: all 0.15s;
+  white-space: nowrap;
+  transition: border-color var(--dur-short) var(--ease-out),
+              color var(--dur-short) var(--ease-out);
 }
+.share-btn:hover:not(:disabled) { border-color: var(--color-accent-soft); color: var(--color-accent); }
+.share-btn:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.share-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-.share-btn:hover:not(:disabled) {
-  border-color: var(--accent-soft);
-  color: var(--accent);
-}
-
-.share-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* ===== 离屏分享卡（供 html-to-image 截图） ===== */
-.share-card-frame {
-  position: fixed;
-  left: -9999px;
-  top: 0;
-  pointer-events: none;
-}
-
+/* ===== 离屏分享卡（html-to-image 截图，保持原配色常量） ===== */
+.share-card-frame { position: fixed; left: -9999px; top: 0; pointer-events: none; }
 .share-card {
   width: 720px;
   padding: 56px 60px;
@@ -648,125 +690,26 @@ mark {
   border-radius: 12px;
   font-family: "Noto Serif SC", "Songti SC", "SimSun", Georgia, serif;
 }
-
-.share-card-title {
-  font-size: 34px;
-  font-weight: 600;
-  letter-spacing: 3px;
-}
-
-.share-card-meta {
-  color: #6b6050;
-  font-size: 17px;
-  margin: 10px 0 32px;
-  letter-spacing: 1px;
-}
-
-.share-card-content {
-  font-size: 22px;
-  line-height: 2.3;
-  letter-spacing: 2px;
-  white-space: pre-line;
-}
-
-.share-card-content.couplets {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 14px;
-}
-
-.share-couplet {
-  display: flex;
-  align-items: baseline;
-  gap: 24px;
-  letter-spacing: 2px;
-}
-
-.share-card-brand {
-  margin-top: 44px;
-  padding-top: 20px;
-  border-top: 1px dashed #e2d9c8;
-  color: #9a8f7c;
-  font-size: 15px;
-  letter-spacing: 1px;
-}
-
-.share-card-brand-mark {
-  color: #8a3b2e;
-  font-weight: 600;
-}
+.share-card-title { font-size: 34px; font-weight: 600; letter-spacing: 3px; }
+.share-card-meta { color: #6b6050; font-size: 17px; margin: 10px 0 32px; letter-spacing: 1px; }
+.share-card-content { font-size: 22px; line-height: 2.3; letter-spacing: 2px; white-space: pre-line; }
+.share-card-content.couplets { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.share-couplet { display: flex; align-items: baseline; gap: 24px; letter-spacing: 2px; }
+.share-card-brand { margin-top: 44px; padding-top: 20px; border-top: 1px dashed #e2d9c8; color: #9a8f7c; font-size: 15px; letter-spacing: 1px; }
+.share-card-brand-mark { color: #8a3b2e; font-weight: 600; }
 
 /* ===== 截图预览弹窗 ===== */
-.screenshot-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 100;
-  padding: 20px;
-}
-.screenshot-modal {
-  background: #faf7f0;
-  border-radius: 12px;
-  max-width: 420px;
-  width: 100%;
-  overflow: hidden;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
-}
-.screenshot-modal-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 18px;
-  font-weight: 600;
-  font-size: 15px;
-  color: var(--ink);
-  border-bottom: 1px solid var(--line);
-}
-.screenshot-close {
-  background: none;
-  border: none;
-  font-size: 18px;
-  cursor: pointer;
-  color: var(--ink-light);
-  padding: 0 4px;
-}
-.screenshot-close:hover {
-  color: var(--ink);
-}
-.screenshot-preview {
-  padding: 16px;
-  display: flex;
-  justify-content: center;
-}
-.screenshot-preview img {
-  max-width: 100%;
-  max-height: 50vh;
-  border-radius: 6px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-.screenshot-actions {
-  display: flex;
-  gap: 12px;
-  padding: 0 18px 18px;
-}
-.screenshot-btn {
-  flex: 1;
-  padding: 10px 0;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: #fff;
-  color: var(--ink);
-  font-size: 14px;
-  cursor: pointer;
-  transition: background 0.15s;
-}
-.screenshot-btn:hover {
-  background: var(--accent-bg);
-}
+.screenshot-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; z-index: 100; padding: var(--space-lg); }
+.screenshot-modal { background: var(--color-paper); border-radius: var(--radius-md); max-width: 420px; width: 100%; overflow: hidden; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25); }
+.screenshot-modal-header { display: flex; align-items: center; justify-content: space-between; padding: var(--space-sm) var(--space-md); font-family: var(--font-ui); font-weight: 600; font-size: var(--text-sm); color: var(--color-ink); border-bottom: var(--rule-hair) solid var(--color-rule); }
+.screenshot-close { background: none; border: none; font-size: 18px; cursor: pointer; color: var(--color-ink-3); padding: 0 4px; }
+.screenshot-close:hover { color: var(--color-ink); }
+.screenshot-preview { padding: var(--space-md); display: flex; justify-content: center; }
+.screenshot-preview img { max-width: 100%; max-height: 50vh; border-radius: var(--radius-xs); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); }
+.screenshot-actions { display: flex; gap: var(--space-sm); padding: 0 var(--space-md) var(--space-md); }
+.screenshot-btn { flex: 1; padding: 10px 0; border: var(--rule-hair) solid var(--color-rule); border-radius: var(--radius-sm); background: var(--color-paper); color: var(--color-ink); font-size: var(--text-sm); cursor: pointer; font-family: var(--font-ui); transition: background var(--dur-short) var(--ease-out); }
+.screenshot-btn:hover { background: var(--color-paper-2); }
+.screenshot-btn:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
 
 /* ===== toast 提示 ===== */
 .share-toast {
@@ -774,94 +717,177 @@ mark {
   left: 50%;
   bottom: 40px;
   transform: translateX(-50%);
-  background: rgba(58, 50, 38, 0.92);
-  color: #faf7f0;
+  background: var(--color-ink);
+  color: var(--color-paper);
   padding: 9px 22px;
-  border-radius: 999px;
-  font-size: 14px;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
   z-index: 50;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
   pointer-events: none;
 }
 
 /* ===== 相关推荐 ===== */
-.related {
-  margin-top: 40px;
-  padding-top: 24px;
-  border-top: 1px solid var(--line);
-}
+.related { margin-top: var(--space-xl); padding-top: var(--space-lg); border-top: var(--rule-hair) solid var(--color-rule); }
+.related-group { margin-bottom: var(--space-md); }
+.related-head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-sm); margin-bottom: 2px; }
+.related-label { font-size: var(--text-sm); font-weight: 600; color: var(--color-accent-soft); margin: 0; }
+.related-refresh { background: transparent; border: var(--rule-hair) solid var(--color-rule); color: var(--color-ink-2); border-radius: var(--radius-pill); padding: 2px 12px; font-size: var(--text-xs); cursor: pointer; white-space: nowrap; transition: border-color var(--dur-short) var(--ease-out), color var(--dur-short) var(--ease-out); }
+.related-refresh:hover:not(:disabled) { border-color: var(--color-accent-soft); color: var(--color-accent); }
+.related-refresh:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.related-refresh:disabled { opacity: 0.5; cursor: not-allowed; }
+.related-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: var(--space-sm); }
+.related-item { background: var(--color-paper-2); border: var(--rule-hair) solid var(--color-rule); border-radius: var(--radius-sm); padding: var(--space-sm) var(--space-sm); display: flex; flex-direction: column; gap: 2px; transition: border-color var(--dur-short) var(--ease-out), transform var(--dur-short) var(--ease-out); min-width: 0; }
+.related-item:hover { border-color: var(--color-rule-strong); transform: translateY(-1px); }
+.related-item-title { font-size: var(--text-sm); font-weight: 600; color: var(--color-ink); overflow-wrap: anywhere; min-width: 0; }
+.related-item-author { font-size: var(--text-xs); color: var(--color-ink-3); white-space: normal; }
 
-.related-group {
-  margin-bottom: 20px;
-}
+/* ============================================================
+   Editions — mode differentiation
+   Classical (古色古香) ↔ Modern (简约现代)
+   ============================================================ */
 
-.related-head {
+/* -------- CLASSICAL edition ornaments -------- */
+.page-classic .section-title {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 2px;
+  gap: var(--space-sm);
+}
+.page-classic .section-title::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  background: var(--color-accent);
+  border-radius: 1px;
+  flex: 0 0 auto;
+  transform: rotate(45deg);
+}
+.page-classic .section-tag::before { content: "「"; margin-right: 0.15em; color: var(--color-accent-soft); }
+.page-classic .section-tag::after { content: "」"; margin-left: 0.15em; color: var(--color-accent-soft); }
+.page-classic .eyebrow { color: var(--color-accent-soft); }
+
+/* classical poem cards —— 书卷 parchment plaques */
+.page-classic .poem-card {
+  background: var(--seal-bg);
+  box-shadow: inset 0 0 0 var(--rule-hair) var(--color-rule);
+}
+.page-classic .poem-card-title { color: var(--color-ink); }
+
+/* classical daily card —— 装裱卷轴 plaque */
+.page-classic .daily-card {
+  box-shadow: 0 0 0 1px var(--color-rule), inset 0 0 0 1px var(--color-paper-2);
+  background: var(--seal-bg);
+  position: relative;
+}
+/* 双边框余韵：上下两条细线 */
+.page-classic .daily-card::before,
+.page-classic .daily-card::after {
+  content: "";
+  position: absolute;
+  left: var(--space-md);
+  right: var(--space-md);
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--seal-line), transparent);
+  pointer-events: none;
+}
+.page-classic .daily-card::before { top: 6px; }
+.page-classic .daily-card::after { bottom: 6px; }
+
+/* classical reader badges —— 印章 chips */
+.page-classic .reader-badges span {
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-xs);
+  padding: 1px 8px;
+  background: var(--color-paper);
 }
 
-.related-label {
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--accent-soft);
-  margin: 0;
-}
+/* classical collection cards —— 藏书格 plaque */
+.page-classic .collection-card { background: var(--seal-bg); }
 
-.related-refresh {
+/* classical related items */
+.page-classic .related-item { background: var(--seal-bg); }
+
+/* -------- MODERN edition —— 简约现代 -------- */
+/* suppress decorative seal / ornament; pure editorial whitespace */
+.page-modern .hero .brand-seal,
+.page-modern .hero .eyebrow { display: none; }
+.page-modern .hero { padding-top: var(--space-3xl); }
+.page-modern .section-tag { color: var(--color-ink-3); }
+.page-modern .eyebrow { color: var(--color-ink-3); }
+
+/* modern poem cards —— 无框 editorial list rows */
+.page-modern .poem-card {
   background: transparent;
-  border: 1px solid var(--line);
-  color: var(--ink-soft);
-  border-radius: 999px;
-  padding: 2px 12px;
-  font-size: 13px;
-  font-family: var(--serif);
-  cursor: pointer;
-  transition: all 0.15s;
-  white-space: nowrap;
+  border: 0;
+  border-bottom: var(--rule-hair) solid var(--color-rule);
+  border-radius: 0;
+  padding: var(--space-sm) var(--space-2xs);
+}
+.page-modern .poem-card:first-child { border-top: 0; }
+.page-modern .poem-card:hover { border-bottom-color: var(--color-rule-strong); }
+.page-modern .poem-list { gap: 0; }
+
+/* modern daily card —— 纯净留白，仅底细线 */
+.page-modern .daily-card {
+  background: transparent;
+  border: 0;
+  border-top: var(--rule-hair) solid var(--color-rule);
+  border-bottom: var(--rule-hair) solid var(--color-rule);
+  border-radius: 0;
+  padding: var(--space-xl) var(--space-2xs);
+}
+.page-modern .daily-card::before,
+.page-modern .daily-card::after { display: none; }
+
+/* modern collection cards —— plain hairline tiles */
+.page-modern .collection-card { background: var(--color-paper-2); }
+
+/* modern related —— minimal */
+.page-modern .related-item { background: transparent; border: 0; border-bottom: var(--rule-hair) solid var(--color-rule); border-radius: 0; }
+
+/* modern accent —— restrain to interactive signals only */
+.page-modern .reader-rule { height: 2px; }
+.page-modern .filter-chip,
+.page-modern .match-tab { border-color: var(--color-rule); }
+.page-modern .filter-chip.active,
+.page-modern .match-tab.active { background: var(--color-ink); border-color: var(--color-ink); color: var(--color-paper); }
+
+/* modern search input —— minimal underline */
+.page-modern .search-input { background: transparent; border: 0; border-bottom: var(--rule-hair) solid var(--color-rule); border-radius: 0; padding-left: 0; padding-right: 0; }
+.page-modern .search-input:focus { box-shadow: none; }
+
+/* ============================================================
+   Reduced motion
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
-.related-refresh:hover:not(:disabled) {
-  border-color: var(--accent-soft);
-  color: var(--accent);
+/* ============================================================
+   Mobile — non-negotiable floor
+   ============================================================ */
+@media (max-width: 600px) {
+  .brand-sub { display: none; }
+  .header-inner { gap: var(--space-sm); }
+  .header-nav { gap: var(--space-sm); }
+  .nav-search .kbd { display: none; }
+  .hero-stats { gap: 0; }
+  .hero-stat { padding: var(--space-sm) var(--space-md); }
+  .daily-card { padding: var(--space-lg) var(--space-md); }
+  /* radio-tabs don't scroll-jump; pills wrap instead */
+  .collection-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+  .related-list { grid-template-columns: 1fr; }
 }
 
-.related-refresh:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.related-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 10px;
-}
-
-.related-item {
-  background: var(--paper-2);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 10px 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  transition: box-shadow 0.15s, transform 0.15s;
-}
-
-.related-item:hover {
-  box-shadow: 0 3px 10px rgba(58, 50, 38, 0.08);
-  transform: translateY(-1px);
-}
-
-.related-item-title {
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.related-item-author {
-  font-size: 13px;
-  color: var(--ink-faint);
+@media (max-width: 380px) {
+  .mode-pill { padding: var(--space-2xs) 11px; font-size: var(--text-xs); }
+  .hero h1 { letter-spacing: 0.05em; }
 }

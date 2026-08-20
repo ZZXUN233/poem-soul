@@ -13,5 +13,12 @@ export default async function SearchPageWrapper({ searchParams }: SearchPageProp
   const sp = await searchParams;
   const mode: Mode = isMode(sp.mode) ? sp.mode : "classic";
   const meta = await getMeta(mode);
-  return <SearchPage mode={mode} dynasties={meta.allDynasties} forms={meta.allForms} />;
+  const skin = mode === "modern" ? "page-modern" : "page-classic";
+  return (
+    <div className={`page ${skin}`}>
+      <div className="container">
+        <SearchPage mode={mode} dynasties={meta.allDynasties} forms={meta.allForms} />
+      </div>
+    </div>
+  );
 }

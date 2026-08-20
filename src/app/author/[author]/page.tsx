@@ -34,6 +34,7 @@ export default async function AuthorPage({
   const sp = await searchParams;
   const mode: Mode = isMode(sp.mode) ? sp.mode : "classic";
   const page = Number(sp.page ?? 1) || 1;
+  const skin = mode === "modern" ? "page-modern" : "page-classic";
 
   const index = await getSearchIndex(mode);
   const works = index.filter((p) => p.author === author);
@@ -49,33 +50,40 @@ export default async function AuthorPage({
   const base = `/author/${encodeURIComponent(author)}?mode=${mode}`;
 
   return (
-    <section className="author-page">
-      <h1 className="reader-title">{author}</h1>
-      <div className="search-meta">
-        共 {total.toLocaleString()} 首 · {mode === "modern" ? "现代诗" : "古诗词"}
-      </div>
-      <div className="poem-list">
-        {items.map((poem) => (
-          <PoemCard key={poem.id} poem={poem} mode={mode} />
-        ))}
-      </div>
-      {totalPages > 1 && (
-        <div className="pagination">
-          {pageClamped > 1 ? (
-            <Link href={`${base}&page=${pageClamped - 1}`}>上一页</Link>
-          ) : (
-            <span className="disabled">上一页</span>
+    <div className={`page ${skin}`}>
+      <div className="container">
+        <section className="author-page">
+          <div className="author-head">
+            <h1 className="reader-title">{author}</h1>
+          </div>
+          <div className="search-meta">
+            共 <b>{total.toLocaleString()}</b> 首 ·{" "}
+            {mode === "modern" ? "现代诗" : "古诗词"}
+          </div>
+          <div className="poem-list">
+            {items.map((poem) => (
+              <PoemCard key={poem.id} poem={poem} mode={mode} />
+            ))}
+          </div>
+          {totalPages > 1 && (
+            <div className="pagination">
+              {pageClamped > 1 ? (
+                <Link href={`${base}&page=${pageClamped - 1}`}>上一页</Link>
+              ) : (
+                <span className="disabled">上一页</span>
+              )}
+              <span>
+                第 <span className="current">{pageClamped}</span> / {totalPages} 页
+              </span>
+              {pageClamped < totalPages ? (
+                <Link href={`${base}&page=${pageClamped + 1}`}>下一页</Link>
+              ) : (
+                <span className="disabled">下一页</span>
+              )}
+            </div>
           )}
-          <span>
-            第 <span className="current">{pageClamped}</span> / {totalPages} 页
-          </span>
-          {pageClamped < totalPages ? (
-            <Link href={`${base}&page=${pageClamped + 1}`}>下一页</Link>
-          ) : (
-            <span className="disabled">下一页</span>
-          )}
-        </div>
-      )}
-    </section>
+        </section>
+      </div>
+    </div>
   );
 }

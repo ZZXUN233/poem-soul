@@ -1,0 +1,99 @@
+/* Hallmark · macrostructure: Manifesto-hero (home) / document-led (app) / long-document (reader)
+ * tone: editorial · anchor hue: vermillion 朱砂 30°
+ * theme: custom 「墨宣 Ink & rice-paper」· paper oklch(93% .02 80) · accent oklch(52% .15 30)
+ * display: Noto Serif SC + Songti SC · body: serif stack · ui: PingFang SC · mono: ui-monospace
+ * axes: light / high-contrast-serif / warm (classic) ↔ near-white / high-contrast-serif / cool (modern)
+ */
+
+:root {
+  /* ---- colour · classic skin (default) ---- */
+  --color-paper:      oklch(93% 0.020 80);
+  --color-paper-2:    oklch(88.5% 0.022 77);
+  --color-paper-3:    oklch(84% 0.025 74);
+  --color-ink:        oklch(31% 0.020 60);
+  --color-ink-2:      oklch(46% 0.020 60);
+  --color-ink-3:      oklch(58% 0.020 58);
+  --color-rule:       oklch(79% 0.020 70);
+  --color-rule-strong: oklch(69% 0.024 66);
+  --color-accent:     oklch(52% 0.150 30);
+  --color-accent-deep: oklch(44% 0.160 28);
+  --color-accent-soft: oklch(61% 0.130 32);
+  --color-accent-paper: oklch(97% 0.015 80);
+  --color-accent-wash: oklch(88% 0.055 32);
+  --color-mark-bg:    oklch(90% 0.090 85);
+  --color-focus:      oklch(60% 0.150 30);
+
+  /* ---- classical-edition ornament (greatly reduced in modern skin) ---- */
+  --seal-bg:      oklch(97% 0.012 80);   /* plaque / card parchment fill */
+  --seal-line:    oklch(82% 0.020 72);   /* warm double-rule hairline */
+  --seal-ink:     oklch(74% 0.045 48);   /* muted seal for ornamental glyphs */
+
+  /* ---- fonts ---- */
+  --font-display: "Noto Serif SC", "Songti SC", "SimSun", serif;
+  --font-body:    "Noto Serif SC", "Songti SC", "SimSun", Georgia, serif;
+  --font-ui:      "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui, sans-serif;
+  --font-mono:    ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  /* ---- spacing (4-pt) ---- */
+  --space-3xs: 0.25rem;
+  --space-2xs: 0.5rem;
+  --space-xs:  0.75rem;
+  --space-sm:  1rem;
+  --space-md:  1.5rem;
+  --space-lg:  2rem;
+  --space-xl:  3rem;
+  --space-2xl: 4.5rem;
+  --space-3xl: 6rem;
+
+  /* ---- type scale ---- */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-md: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.375rem;
+  --text-2xl: 1.75rem;
+  --text-3xl: 2.25rem;
+  --text-display:    clamp(2.6rem, 6vw, 4.6rem);
+  --text-display-s:  clamp(2rem, 5vw, 3.4rem);
+
+  /* ---- easing ---- */
+  --ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in:     cubic-bezier(0.4, 0, 1, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+  /* ---- duration ---- */
+  --dur-short: 180ms;
+  --dur-base:  260ms;
+  --dur-slow:  420ms;
+
+  /* ---- radius ---- */
+  --radius-xs:   6px;
+  --radius-sm:   10px;
+  --radius-md:   14px;
+  --radius-pill: 999px;
+
+  /* ---- measure ---- */
+  --measure-read: 34em;
+  --rule-hair: 1px;
+}
+
+/* ==== modern skin ===================================================
+   Scope: any element under .page-modern. Overrides paper/ink/rule only;
+   spacing, easing, type, accent-voice shared with classic. */
+.page-modern {
+  --color-paper:      oklch(98.5% 0.004 90);
+  --color-paper-2:    oklch(96% 0.005 90);
+  --color-paper-3:    oklch(93% 0.006 90);
+  --color-ink:        oklch(31% 0.008 270);
+  --color-ink-2:      oklch(46% 0.008 268);
+  --color-ink-3:      oklch(58% 0.006 266);
+  --color-rule:       oklch(87% 0.006 88);
+  --color-rule-strong: oklch(79% 0.008 86);
+  --color-accent:     oklch(54% 0.140 28);
+  --color-accent-deep: oklch(46% 0.150 27);
+  --color-accent-soft: oklch(62% 0.120 30);
+  --color-accent-paper: oklch(98% 0.010 92);
+  --color-accent-wash: oklch(90% 0.050 34);
+  --color-mark-bg:    oklch(91% 0.080 88);
+  --color-focus:      oklch(61% 0.150 30);
+}
