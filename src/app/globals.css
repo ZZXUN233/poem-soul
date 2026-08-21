@@ -151,6 +151,22 @@ button {
 }
 .nav-search:hover { color: var(--color-accent); border-color: var(--color-accent-soft); }
 .nav-search:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+/* 抽卡入口 —— 与搜索同款名词态 CTA */
+.nav-cards {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  color: var(--color-ink-2);
+  padding: var(--space-2xs) var(--space-sm);
+  border-radius: var(--radius-pill);
+  border: var(--rule-hair) solid var(--color-rule);
+  background: var(--color-paper);
+  white-space: nowrap;
+  transition: color var(--dur-short) var(--ease-out),
+              border-color var(--dur-short) var(--ease-out);
+}
+.nav-cards:hover { color: var(--color-accent); border-color: var(--color-accent-soft); }
+.nav-cards:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
 .nav-search .kbd {
   font-family: var(--font-mono);
   font-size: var(--text-xs);
@@ -549,6 +565,32 @@ mark {
 .reader-back:active { color: var(--color-accent-deep); }
 .reader-back:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
 
+/* 阅读页收藏按钮 */
+.fav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  color: var(--color-ink-2);
+  background: var(--color-paper-2);
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-pill);
+  padding: 6px 16px;
+  cursor: pointer;
+  margin: var(--space-md) auto var(--space-sm);
+  transition: color var(--dur-short) var(--ease-out),
+    border-color var(--dur-short) var(--ease-out),
+    background var(--dur-short) var(--ease-out);
+}
+.fav-btn:hover { border-color: var(--color-accent-soft); color: var(--color-accent); }
+.fav-btn.active {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-accent-paper);
+}
+.fav-btn:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+
 .reader {
   max-width: var(--measure-read);
   margin: 0 auto;
@@ -912,4 +954,343 @@ mark {
 @media (max-width: 380px) {
   .mode-pill { padding: var(--space-2xs) 11px; font-size: var(--text-xs); }
   .hero h1 { letter-spacing: 0.05em; }
+}
+
+/* ============================================================
+   抽卡模式 —— 全屏沉浸卡片堆叠
+   ============================================================ */
+.cards-page { min-height: 100vh; display: flex; align-items: stretch; }
+
+.card-stage {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-lg) var(--space-md) var(--space-xl);
+  position: relative;
+  min-height: 100vh;
+}
+
+.card-toolbar {
+  position: absolute;
+  top: var(--space-md);
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-lg);
+  pointer-events: none;
+  z-index: 50; /* 始终压在卡片堆叠之上，保证关闭/收藏按钮可点 */
+}
+.card-close {
+  pointer-events: auto;
+  background: var(--color-paper-2);
+  border: var(--rule-hair) solid var(--color-rule);
+  color: var(--color-ink-2);
+  border-radius: var(--radius-pill);
+  width: 40px; height: 40px;
+  font-size: var(--text-lg);
+  cursor: pointer;
+  transition: color var(--dur-short) var(--ease-out), border-color var(--dur-short) var(--ease-out);
+}
+.card-close:hover { color: var(--color-accent); border-color: var(--color-accent-soft); }
+.card-close:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.card-mode-label {
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  letter-spacing: 0.08em;
+  color: var(--color-ink-3);
+}
+
+.card-loading,
+.card-empty {
+  color: var(--color-ink-3);
+  font-family: var(--font-ui);
+  font-size: var(--text-md);
+  text-align: center;
+  padding: var(--space-xl);
+}
+.card-empty { display: flex; flex-direction: column; gap: var(--space-md); align-items: center; }
+.card-redeal {
+  background: var(--color-paper-2);
+  border: var(--rule-hair) solid var(--color-rule);
+  color: var(--color-accent);
+  border-radius: var(--radius-pill);
+  padding: 6px 20px;
+  font-size: var(--text-sm);
+  cursor: pointer;
+}
+.card-redeal:hover { border-color: var(--color-accent-soft); }
+.card-redeal:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+
+.card-deck {
+  position: relative;
+  width: min(92vw, 34em);
+  height: min(72vh, 42em);
+  margin: var(--space-md) 0 var(--space-lg);
+}
+
+.card {
+  position: absolute;
+  inset: 0;
+  background: var(--color-paper-2);
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-md);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+/* 卡片深度（后几张的下移/缩放/透明度）由内联 card-depth 样式提供 */
+
+/* 顶卡飞出动画（按钮触发）；正常态为原位/不透明（无入场动画，避免重渲抖动） */
+.card-top {
+  transform: translate(0, 0);
+  opacity: 1;
+}
+.card-fly-like {
+  animation: fly-like 340ms var(--ease-in) forwards;
+}
+.card-fly-skip {
+  animation: fly-skip 340ms var(--ease-in) forwards;
+}
+@keyframes fly-like {
+  to { transform: translate(640px, -24px) rotate(8deg); opacity: 0; }
+}
+@keyframes fly-skip {
+  to { transform: translate(-640px, 24px) rotate(-8deg); opacity: 0; }
+}
+
+.card-verso {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-xl) var(--space-lg);
+  box-sizing: border-box;
+  text-align: center;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.card-modern .card-verso { text-align: left; align-items: flex-start; }
+
+.card-verso-head {
+  height: var(--space-lg);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+.card-modern .card-verso-head { justify-content: flex-start; }
+.card-faved {
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  color: var(--color-accent);
+  border: var(--rule-hair) solid var(--color-accent-soft);
+  border-radius: var(--radius-pill);
+  padding: 2px 10px;
+}
+
+.card-title {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: 600;
+  font-style: normal;
+  letter-spacing: 0.05em;
+  margin: 0 0 var(--space-2xs);
+  overflow-wrap: anywhere;
+}
+.card-meta {
+  color: var(--color-ink-3);
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  letter-spacing: 0.06em;
+}
+.card-rule {
+  width: 2.5rem;
+  height: 3px;
+  background: var(--color-accent);
+  border: 0;
+  margin: var(--space-md) auto var(--space-lg);
+}
+.card-modern .card-rule { margin-left: 0; }
+
+.card-jushi {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: var(--text-lg);
+  line-height: 1.9;
+}
+.card-couplet { display: flex; align-items: baseline; gap: var(--space-md); letter-spacing: 1px; }
+.card-couplet .out { text-align: right; }
+.card-couplet .in { text-align: left; }
+.card-modern .card-jushi { align-items: flex-start; }
+
+.card-content {
+  font-size: var(--text-lg);
+  line-height: 1.9;
+  white-space: pre-line;
+  color: var(--color-ink);
+}
+
+.deck-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+.deck-btn {
+  border: 0;
+  border-radius: var(--radius-pill);
+  padding: 10px 22px;
+  font-size: var(--text-sm);
+  font-family: var(--font-ui);
+  cursor: pointer;
+  transition: box-shadow var(--dur-short) var(--ease-out), background var(--dur-short) var(--ease-out);
+}
+.deck-btn:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.deck-skip {
+  background: var(--color-paper-2);
+  border: var(--rule-hair) solid var(--color-rule);
+  color: var(--color-ink-2);
+}
+.deck-skip:hover { border-color: var(--color-rule-strong); }
+.deck-like {
+  background: var(--color-accent);
+  color: var(--color-accent-paper);
+}
+.deck-like:hover { background: var(--color-accent-deep); }
+.deck-hint {
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  color: var(--color-ink-3);
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.card-toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+.card-fav-btn {
+  background: transparent;
+  border: var(--rule-hair) solid var(--color-rule);
+  color: var(--color-ink-3);
+  border-radius: var(--radius-pill);
+  width: 40px;
+  height: 40px;
+  font-size: var(--text-lg);
+  cursor: pointer;
+  pointer-events: auto; /* toolbar 容器 pointer-events:none，按钮需自行开启 */
+  transition: color var(--dur-short) var(--ease-out),
+    border-color var(--dur-short) var(--ease-out),
+    background var(--dur-short) var(--ease-out);
+}
+.card-fav-btn:hover { color: var(--color-accent); border-color: var(--color-accent-soft); }
+.card-fav-btn.active { background: var(--color-accent); border-color: var(--color-accent); color: var(--color-accent-paper); }
+.card-fav-btn:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+
+/* 「我的收藏」抽屉 */
+.fav-drawer {
+  position: absolute;
+  right: var(--space-md);
+  top: var(--space-2xl);
+  width: min(24em, calc(100vw - 2 * var(--space-md)));
+  max-height: 70vh;
+  background: var(--color-paper-2);
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-md);
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.14);
+  display: flex;
+  flex-direction: column;
+  z-index: 40;
+  overflow: hidden;
+}
+.fav-drawer-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-sm) var(--space-md);
+  border-bottom: var(--rule-hair) solid var(--color-rule);
+}
+.fav-drawer-title {
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: var(--color-ink);
+}
+.fav-drawer-close {
+  background: transparent;
+  border: 0;
+  color: var(--color-ink-3);
+  font-size: var(--text-lg);
+  cursor: pointer;
+}
+.fav-drawer-close:hover { color: var(--color-accent); }
+.fav-empty {
+  padding: var(--space-lg);
+  text-align: center;
+  color: var(--color-ink-3);
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+}
+.fav-list {
+  list-style: none;
+  margin: 0;
+  padding: var(--space-2xs) var(--space-xs);
+  overflow-y: auto;
+  max-height: 56vh;
+}
+.fav-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-2xs) var(--space-2xs);
+  border-radius: var(--radius-xs);
+}
+.fav-item:hover { background: var(--color-paper-3); }
+.fav-item-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.fav-item-title {
+  font-family: var(--font-display);
+  font-size: var(--text-md);
+  font-weight: 600;
+  color: var(--color-ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.fav-item-meta {
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  color: var(--color-ink-3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.fav-item-remove {
+  flex: none;
+  background: transparent;
+  border: 0;
+  color: var(--color-ink-3);
+  cursor: pointer;
+  padding: 4px;
+}
+.fav-item-remove:hover { color: var(--color-accent); }
+
+@media (max-width: 600px) {
+  .card-title { font-size: var(--text-xl); }
+  .card-jushi { font-size: var(--text-md); }
+  .card-content { font-size: var(--text-md); }
+  .deck-hint { display: none; }
+  .card-mode-label { display: none; }
 }

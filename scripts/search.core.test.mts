@@ -16,6 +16,13 @@ import {
 } from "../src/lib/search";
 import { poemLines, transformable } from "../src/lib/format";
 import { getRelatedBatch, getRelatedPoems } from "../src/lib/related";
+import {
+  FAVORITES_KEY,
+  addFavorite,
+  getFavorites,
+  isFavorite,
+  removeFavorite,
+} from "../src/lib/favorites";
 import type { Poem } from "../src/types";
 
 const poem: Poem = {
@@ -381,4 +388,70 @@ test("poemHref 默认模式下 URL 干净", () => {
 
 test("storeMode 无 window 安全（Node 环境不抛错）", () => {
   assert.doesNotThrow(() => storeMode("modern"));
+});
+
+/* ---- favorites 抽卡收藏 ---- */
+
+/** 内存版 storage，模拟浏览器 localStorage */
+function memoryStorage() {
+  const map = new Map<string, string>();
+  return {
+    getItem: (k: string) => (map.has(k) ? map.get(k)! : null),
+    setItem: (k: string, v: string) => {
+      map.set(k, v);
+    },
+    snapshot: () => map,
+  };
+}
+
+test("getFavorites 无存储时返回空、不抛错（Node 降级）", () => {
+  assert.deepEqual(getFavorites(null), []);
+  assert.equal(isFavorite("tang-000001", null), false);
+});
+
+test("addFavorite 去重且回写持久化", () => {
+  const st = memoryStorage();
+  addFavorite("tang-000001", st);
+  addFavorite("tang-000002", st);
+  addFavorite("tang-000001", st); // 重复不应再次入列
+  assert.deepEqual(getFavorites(st), ["tang-000001", "tang-000002"]);
+  assert.equal(isFavorite("tang-000001", st), true);
+  assert.equal(isFavorite("song_ci-1", st), false);
+  // 键值确实写入了 storage
+  const raw = st.getItem(FAVORITES_KEY);
+  assert.deepEqual(JSON.parse(raw!), ["tang-000001", "tang-000002"]);
+});
+
+test("addFavorite 超出上限丢弃最旧", () => {
+  const st = memoryStorage();
+  for (let i = 0; i < 1005; i++) addFavorite(`id-${i}`, st);
+  const list = getFavorites(st);
+  assert.equal(list.length, 1000);
+  // 保留了最后 1000 条，最旧的 5 条被丢弃
+  assert.equal(list[0], "id-5");
+  assert.equal(list[list.length - 1], "id-1004");
+});
+
+test("removeFavorite 删除指定 id", () => {
+  const st = memoryStorage();
+  addFavorite("a", st);
+  addFavorite("b", st);
+  addFavorite("c", st);
+  removeFavorite("b", st);
+  assert.deepEqual(getFavorites(st), ["a", "c"]);
+  removeFavorite("不存在", st);
+  assert.deepEqual(getFavorites(st), ["a", "c"]);
+});
+
+test("addFavorite 写抛出异常时静默（安全降级）", () => {
+  const throwing: {
+    getItem: (k: string) => string | null;
+    setItem: (k: string, v: string) => void;
+  } = {
+    getItem: () => "[]",
+    setItem: () => {
+      throw new Error("quota");
+    },
+  };
+  assert.doesNotThrow(() => addFavorite("x", throwing));
 });

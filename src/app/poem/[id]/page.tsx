@@ -6,6 +6,7 @@ import PoemReader from "@/components/PoemReader";
 import ReaderBack from "@/components/ReaderBack";
 import ShareActions from "@/components/ShareActions";
 import RelatedSection from "@/components/RelatedSection";
+import FavoriteButton from "@/components/FavoriteButton";
 
 export const dynamic = "force-dynamic";
 
@@ -37,6 +38,7 @@ export default async function ReaderPage({
       <div className="container">
         <ReaderBack />
         <PoemReader poem={poem} mode={mode} />
+        <FavoriteButton id={poem.id} />
         <ShareActions poem={poem} />
         <RelatedSection poem={poem} initialRelated={related} mode={mode} />
       </div>
