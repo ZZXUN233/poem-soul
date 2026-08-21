@@ -6,7 +6,7 @@ import DailyPoem from "@/components/DailyPoem";
 export const dynamic = "force-dynamic";
 
 interface HomePageProps {
-  searchParams: Promise<{ collection?: string; page?: string; mode?: string }>;
+  searchParams: Promise<{ mode?: string }>;
 }
 
 /** 首页 / 书架 */
@@ -14,7 +14,6 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   const sp = await searchParams;
   const mode: Mode = isMode(sp.mode) ? sp.mode : "classic";
   const meta = await getMeta(mode);
-  const initialCollection = sp.collection ?? "";
   const skin = mode === "modern" ? "page-modern" : "page-classic";
 
   return (
@@ -49,7 +48,6 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           mode={mode}
           dynasties={meta.allDynasties}
           forms={meta.allForms}
-          initialCollection={initialCollection}
         />
       </div>
     </div>

@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { DEFAULT_MODE, isMode, type Mode } from "@/lib/mode";
 
@@ -9,10 +8,10 @@ const OPTIONS: { value: Mode; label: string }[] = [
   { value: "modern", label: "现代诗" },
 ];
 
-/** 在诗歌详情页等语料库专属路径切换模式时，回退到首页 */
-function switchTarget(pathname: string, m: Mode): string {
+/** 在诗歌详情页等语料库专属路径切换模式时，回退到首页（只返回裸路径，query 由调用方拼接，避免 mode 重复） */
+function switchTarget(pathname: string): string {
   if (pathname.startsWith("/poem/") || pathname.startsWith("/author/")) {
-    return m === DEFAULT_MODE ? "/" : `/?mode=${m}`;
+    return "/";
   }
   return pathname;
 }
@@ -24,15 +23,12 @@ export default function ModeToggle() {
   const searchParams = useSearchParams();
 
   const paramMode = searchParams.get("mode");
-  // 模式完全由 URL 决定：无 ?mode= 时默认古诗词，不做 localStorage 覆盖
-  // （保证与服务端渲染的正文模式一致，避免"标题显示现代诗、内容是古诗词"的错位）
-  const [current, setCurrent] = useState<Mode>(
-    isMode(paramMode) ? paramMode : DEFAULT_MODE
-  );
+  // 当前模式完全由 URL 推导（无 ?mode= 时缺省为古诗词），不维护本地 state，
+  // 这样服务端导航/浏览器返回/新开页/地址栏直达都能让 tag 高亮始终与页面正文一致。
+  const current: Mode = isMode(paramMode) ? paramMode : DEFAULT_MODE;
 
   const switchTo = (m: Mode) => {
     if (m === current) return;
-    setCurrent(m);
     let query: URLSearchParams;
     let base: string;
     if (pathname === "/search") {
@@ -41,7 +37,7 @@ export default function ModeToggle() {
       query.set("mode", m);
       base = pathname;
     } else {
-      base = switchTarget(pathname, m);
+      base = switchTarget(pathname);
       query = new URLSearchParams(searchParams.toString());
       query.set("mode", m);
     }

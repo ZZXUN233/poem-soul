@@ -527,6 +527,28 @@ mark {
 /* ============================================================
    阅读页 —— the heart
    ============================================================ */
+.reader-back {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.35em;
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  letter-spacing: 0.03em;
+  color: var(--color-ink-3);
+  background: transparent;
+  border: 0;
+  padding: var(--space-2xs) 0;
+  margin: 0 auto var(--space-md);
+  max-width: var(--measure-read);
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  transition: color var(--dur-short) var(--ease-out);
+}
+.reader-back:hover { color: var(--color-accent); }
+.reader-back:active { color: var(--color-accent-deep); }
+.reader-back:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+
 .reader {
   max-width: var(--measure-read);
   margin: 0 auto;

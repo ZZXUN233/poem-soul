@@ -3,6 +3,7 @@ import { getPoemById, getSearchIndex } from "@/lib/corpus";
 import { getRelatedPoems } from "@/lib/related";
 import { isMode, type Mode } from "@/lib/mode";
 import PoemReader from "@/components/PoemReader";
+import ReaderBack from "@/components/ReaderBack";
 import ShareActions from "@/components/ShareActions";
 import RelatedSection from "@/components/RelatedSection";
 
@@ -34,6 +35,7 @@ export default async function ReaderPage({
   return (
     <div className={`page ${skin}`}>
       <div className="container">
+        <ReaderBack />
         <PoemReader poem={poem} mode={mode} />
         <ShareActions poem={poem} />
         <RelatedSection poem={poem} initialRelated={related} mode={mode} />
